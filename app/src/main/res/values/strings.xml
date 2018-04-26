@@ -1,0 +1,43 @@
+<resources>
+    <string name="app_name">GaryTransportNew</string>
+    <string name="errormsfg">sfsfsfsfsfsfsfs</string>
+    <string name="error_gif">x or y bound size should be at least %1$dpx and file size should be no more than %2$sM</string>
+
+    <string name="Verifyyoutphone">Veryfication Code</string>
+    <string name="OtpNumber">Please enter the veryfication code sent to </string>
+
+    <!-- Strings related to login -->
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password </string>
+    <string name="next">Next</string>
+    <string name="Vehicleinfo">Vehicle Info</string>
+    <string name="one">1</string>
+    <string name="two">2</string>
+    <string name="three">3</string>
+    <string name="four">4</string>
+    <string name="five">5</string>
+    <string name="sixe">6</string>
+    <string name="seven">7</string>
+    <string name="eight">8</string>
+    <string name="nine">9</string>
+    <string name="zero">0</string>
+    <string name="firstname">First Name</string>
+    <string name="lastname">Last Name</string>
+    <string name="phone">Phone Number</string>
+    <string name="selectmake">Select Make</string>
+    <string name="seletcmodel">Select Model</string>
+    <string name="selectcolor">Select Color</string>
+    <string name="vehiclesize">Vehicle Size</string>
+    <string name="done">Done</string>
+    <string name="needaspot">NEED A SPOT</string>
+    <string name="leaveaspot">LEAVE A SPOT</string>
+    <string name="postedschediule">POSTED \n SCHEDULE</string>
+    <string name="myacccount">MY \n ACCOUNT</string>
+    <string name="location">Location:</string>
+    <string name="size">Size:</string>
+    <string name="distance">Distance :</string>
+    <string name="accept">Accept</string>
+
+
+</resources>
+
