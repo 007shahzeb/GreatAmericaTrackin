@@ -6,6 +6,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.mikepenz.fastadapter.FastAdapter;
@@ -22,8 +23,13 @@ public class SimpleItem extends AbstractItem<SimpleItem, SimpleItem.ViewHolder> 
     public Shipment getShipment() {
         return shipment;
     }
+
     public void setShipment(Shipment shipment) {
         this.shipment = shipment;
+    }
+
+
+    public SimpleItem() {
     }
 
     public SimpleItem(Shipment shipment) {
@@ -52,20 +58,23 @@ public class SimpleItem extends AbstractItem<SimpleItem, SimpleItem.ViewHolder> 
         private View view_forAll;
         public TextView tv_Accept, tv_ShipmentNumber, tv_Date;
         public TextView upload_file;
+        public Button information , reject;
 
         public ViewHolder(View view) {
             super(view);
+
             tv_Accept = view.findViewById(R.id.tv_Accept);
             tv_ShipmentNumber = view.findViewById(R.id.tv_ShipmentNumber);
             tv_Date = view.findViewById(R.id.tv_Date);
             view_forAll = view.findViewById(R.id.view_forAll);
             upload_file = view.findViewById(R.id.upload_file);
+            information = view.findViewById(R.id.information);
+            reject = view.findViewById(R.id.reject);
 
         }
 
         @Override
         public void bindView(@NonNull SimpleItem item, @NonNull List<Object> payloads) {
-            //get the context
             Context ctx = itemView.getContext();
 
             tv_Date.setText(item.shipment.getDate());
@@ -78,11 +87,9 @@ public class SimpleItem extends AbstractItem<SimpleItem, SimpleItem.ViewHolder> 
 
             if (tv_Accept.getText().toString().equalsIgnoreCase("ACCEPT")) {
                 tv_Accept.setBackground(tv_Date.getContext().getResources().getDrawable(R.drawable.rounded_button_accept));
-            }else if (tv_Accept.getText().toString().equalsIgnoreCase("ON THE WAY"))
-            {
+            } else if (tv_Accept.getText().toString().equalsIgnoreCase("ON THE WAY")) {
                 tv_Accept.setBackground(tv_Date.getContext().getResources().getDrawable(R.drawable.rounded_button_ontheway));
-            }else if (tv_Accept.getText().toString().equalsIgnoreCase("REACHED"))
-            {
+            } else if (tv_Accept.getText().toString().equalsIgnoreCase("REACHED")) {
                 tv_Accept.setBackground(tv_Date.getContext().getResources().getDrawable(R.drawable.rounded_button_reached));
             }
 

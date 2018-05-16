@@ -12,7 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="Transport_doc_file.jpg"
+        android:text=""
         android:textSize="@dimen/_12sdp"
         app:layout_constraintStart_toStartOf="@+id/constraintLayout"
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
@@ -22,7 +22,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="2.3 MB of 8 MB"
+        android:text=""
         android:textSize="@dimen/_12sdp"
         app:layout_constraintStart_toStartOf="@+id/tv_transport_docFile"
         app:layout_constraintTop_toBottomOf="@+id/tv_transport_docFile" />
@@ -47,7 +47,6 @@
         app:layout_constraintTop_toBottomOf="@+id/tv_MBTextview" />
 
     <TextView
-
         android:id="@+id/textView10"
         android:layout_width="0dp"
         android:layout_height="36dp"
@@ -56,12 +55,14 @@
         android:text="CANCEL"
         android:textColor="#ffffff"
         android:textStyle="bold"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/textView11"
+        app:layout_constraintEnd_toStartOf="@+id/imageUploadingButton"
         app:layout_constraintStart_toStartOf="parent" />
 
+
     <TextView
-        android:id="@+id/textView11"
+        android:id="@+id/imageUploadingButton"
         android:layout_width="0dp"
         android:layout_height="36dp"
         android:background="@drawable/rounded_button_uploading"
@@ -69,9 +70,11 @@
         android:text="UPLOADING..."
         android:textColor="#ffffff"
         android:textStyle="bold"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/textView10" />
+
 
     <View
         android:id="@+id/textView4"
@@ -83,9 +86,9 @@
     <android.support.constraint.ConstraintLayout
         android:id="@+id/constraintLayout"
         android:layout_width="0dp"
-        android:background="@drawable/dotted"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/_15sdp"
+        android:background="@drawable/dotted"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -153,6 +156,8 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.694"
         app:srcCompat="@drawable/flag_andorra" />
+
+
 
 
 </android.support.constraint.ConstraintLayout>

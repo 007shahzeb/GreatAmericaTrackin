@@ -1,7 +1,9 @@
 package android.com.activity;
 
+import android.com.ProgressRequestBody;
 import android.com.garytransportnew.R;
-import android.content.Context;
+import android.com.net.HttpModule;
+import android.com.responseModel.ResponseUploadDocumnets;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -16,24 +18,37 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.mindorks.paracamera.Camera;
+import com.sdsmdg.tastytoast.TastyToast;
 
-import java.io.ByteArrayOutputStream;
+import java.io.File;
 
-public class UploadImageActivity extends AppCompatActivity implements View.OnClickListener {
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
-    private ImageView image_Camera , test ;
-    private TextView tv_SelectFromPhotos , tv_transport_docFile , tv_MBTextview;
-    private static int RESULT_LOAD_IMAGE = 1;
-    ProgressBar Progressbar;
+public class UploadImageActivity extends AppCompatActivity implements View.OnClickListener, ProgressRequestBody.UploadCallbacks {
+
+    private ImageView image_Camera, test;
+    private TextView tv_SelectFromPhotos, tv_transport_docFile, tv_MBTextview;
+    private static int RESULT_LOAD_IMAGE = 2;
+    ProgressBar mProgressBar;
     Handler handler = new Handler();
 
-    private TextView showingProgressiveValue;
+    private TextView showingProgressiveValue, imageUploadingButton;
+    public Camera camera;
+    public Uri selectedImage;
+    public Bitmap bitmap;
+    public RequestBody requestFile;
+    String filePath = "";
+    int file_size, file_size_gallery;
 
-    // Create global camera reference in an activity or fragment
-    Camera camera;
+    MultipartBody.Part filePart;
+    ProgressRequestBody fileBody;
+//    int size;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -47,9 +62,9 @@ public class UploadImageActivity extends AppCompatActivity implements View.OnCli
 //        progressing();
 
 
-
         ActionBar actionBar = getSupportActionBar();
         actionBar.hide();
+
     }
 
 //    private void progressing() {
@@ -66,8 +81,8 @@ public class UploadImageActivity extends AppCompatActivity implements View.OnCli
 //                        @Override
 //                        public void run() {
 //
-//                            Progressbar.setProgress(progressBarValue);
-////                            showingProgressiveValue.setText(progressBarValue + "/" + Progressbar.getMax()); // Shwoing Progressive Value
+//                            mProgressBar.setProgress(progressBarValue);
+////                            showingProgressiveValue.setText(progressBarValue + "/" + mProgressBar.getMax()); // Shwoing Progressive Value
 //
 //                        }
 //                    });
@@ -80,7 +95,6 @@ public class UploadImageActivity extends AppCompatActivity implements View.OnCli
 //            }
 //        }).start();
 //    }
-
 
 
     private void buildingTheGallery() {
@@ -113,38 +127,61 @@ public class UploadImageActivity extends AppCompatActivity implements View.OnCli
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == Camera.REQUEST_TAKE_PHOTO) {
-            Bitmap bitmap = camera.getCameraBitmap();
+            bitmap = camera.getCameraBitmap();
             if (bitmap != null) {
+                filePath = camera.getCameraBitmapPath();
+                File file = new File(filePath);
+                file_size = Integer.parseInt(String.valueOf(file.length() / 1024)); // Getting the file size here in MB
 
-//                test.setImageBitmap(bitmap); // Getting The Bitmap here to save it and send it to server
+                String path = filePath;//it contain your path of image..im using a temp string..
+                String filename = path.substring(path.lastIndexOf("/") + 1); // Getting the file name here
+
+                tv_transport_docFile.setText(filename);
+                tv_MBTextview.setText(String.valueOf(file_size) + " KB");
+
+                fileBody = new ProgressRequestBody(file, this);
+                filePart = MultipartBody.Part.createFormData("image", file.getName(), fileBody);
+                System.out.println("UploadImageActivity.onActivityResult - - -" + filePart);
+//                mProgressBar.setMax(100);
+//                size = file_size;
 
             } else {
-                Toast.makeText(this.getApplicationContext(), "Picture not taken!", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(this.getApplicationContext(), "Picture not taken!", Toast.LENGTH_SHORT).show();
             }
-        } else if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && null != data) {
-            System.out.println("UploadImageActivity.onActivityResult Testing ");
-            Uri selectedImage = data.getData();
-            String[] filePathColumn = {MediaStore.Images.Media.DATA};
 
+        } else if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && null != data) {
+            System.out.println("UploadImageActivity.onActivityResult = = = else case ");
+            selectedImage = data.getData();
+            String[] filePathColumn = {MediaStore.Images.Media.DATA};
             Cursor cursor = getContentResolver().query(selectedImage,
                     filePathColumn, null, null, null);
             cursor.moveToFirst();
-
             int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-            String picturePath = cursor.getString(columnIndex);
-            System.out.println("UploadImageActivity.onActivityResult 0 - - -  picture path " + picturePath);
+            filePath = cursor.getString(columnIndex);
+            File file = new File(filePath);
+            file_size_gallery = Integer.parseInt(String.valueOf(file.length() / 1024));
+//            mProgressBar.setIndeterminate(true);
+
+            String path = filePath;//it contain your path of image..im using a temp string..
+            String filename_gallery = path.substring(path.lastIndexOf("/") + 1);
+            System.out.println("UploadImageActivity.onActivityResult - - " + filename_gallery);
+            tv_transport_docFile.setText(filename_gallery);
+            tv_MBTextview.setText(String.valueOf(file_size_gallery) + " KB");
             cursor.close();
 
-//            ImageView imageView = (ImageView) findViewById(R.id.imgView);
-//            imageView.setImageBitmap(BitmapFactory.decodeFile(picturePath));
+            fileBody = new ProgressRequestBody(file, this);
+            filePart = MultipartBody.Part.createFormData("image", file.getName(), fileBody);
+            System.out.println("UploadImageActivity.onActivityResult - - -" + filePart);
+
+//            size = file_size_gallery;
         }
     }
-
 
 
     private void listener() {
         image_Camera.setOnClickListener(this);
         tv_SelectFromPhotos.setOnClickListener(this);
+        imageUploadingButton.setOnClickListener(this);
     }
 
 
@@ -162,10 +199,11 @@ public class UploadImageActivity extends AppCompatActivity implements View.OnCli
 
         image_Camera = findViewById(R.id.image_Camera);
         tv_SelectFromPhotos = findViewById(R.id.tv_SelectFromPhotos);
-        Progressbar = (ProgressBar) findViewById(R.id.progressBar1);
+        mProgressBar = (ProgressBar) findViewById(R.id.progressBar1);
         tv_MBTextview = findViewById(R.id.tv_MBTextview);
         tv_transport_docFile = findViewById(R.id.tv_transport_docFile);
         test = findViewById(R.id.test);
+        imageUploadingButton = findViewById(R.id.imageUploadingButton);
 
     }
 
@@ -175,17 +213,47 @@ public class UploadImageActivity extends AppCompatActivity implements View.OnCli
         int id = v.getId();
 
         switch (id) {
+
             case R.id.image_Camera: {
                 clickingPicturesFromCamera();
+                break;
             }
 
             case R.id.tv_SelectFromPhotos: {
-//                takingPicturesFromGaleery();
                 buildingTheGallery();
+                break;
+            }
+
+            case R.id.imageUploadingButton: {
+                mProgressBar.setIndeterminate(true);
+                TastyToast.makeText(getApplicationContext(), "Document Uploaded Successfully", TastyToast.LENGTH_SHORT, TastyToast.SUCCESS).show();
+                finish();
+//                uploadingDocumentsAPICalling();
+                break;
             }
         }
 
 
+    }
+
+    private void uploadingDocumentsAPICalling() {
+        System.out.println("UploadImageActivity.uploadingDocumentsAPICalling");
+        HttpModule.provideRepositoryService().getUploadDocumnetsAPI("10", filePart).enqueue(new Callback<ResponseUploadDocumnets>() {
+            @Override
+            public void onResponse(Call<ResponseUploadDocumnets> call, Response<ResponseUploadDocumnets> response) {
+
+                System.out.println("UploadImageActivity.onResponse");
+
+                if (response.body().isSuccess) {
+                    mProgressBar.setIndeterminate(false);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseUploadDocumnets> call, Throwable t) {
+                System.out.println("UploadImageActivity.onFailure " + t);
+            }
+        });
     }
 
     // The bitmap is saved in the app's folder
@@ -197,4 +265,22 @@ public class UploadImageActivity extends AppCompatActivity implements View.OnCli
     }
 
 
+    @Override
+    public void onProgressUpdate(int percentage) {
+        System.out.println("UploadImageActivity.onProgressUpdate" + percentage);
+        mProgressBar.setProgress(percentage);
+    }
+
+    @Override
+    public void onError() {
+        System.out.println("UploadImageActivity.onError");
+
+    }
+
+    @Override
+    public void onFinish() {
+        mProgressBar.setProgress(100);
+        System.out.println("UploadImageActivity.onFinish");
+
+    }
 }

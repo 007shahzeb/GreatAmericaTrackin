@@ -1,12 +1,17 @@
 package android.com.activity;
 
 
+import android.com.InternetConnection;
 import android.com.garytransportnew.R;
 import android.com.net.HttpModule;
 import android.com.responseModel.ResponseDriverNumber;
 import android.com.responseModel.ResponseOtpNumber;
 import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -23,6 +28,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.sdsmdg.tastytoast.TastyToast;
+import com.taishi.flipprogressdialog.FlipProgressDialog;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -40,6 +49,9 @@ public class VeryficationCodeActivity extends AppCompatActivity {
 
     int userId;
     private long lastClickTime = 0;
+    FlipProgressDialog fpd;
+
+    Context context;
 
 
     @Override
@@ -75,6 +87,8 @@ public class VeryficationCodeActivity extends AppCompatActivity {
         mEd2.setInputType(InputType.TYPE_NULL);
         mEd3.setInputType(InputType.TYPE_NULL);
         mEd4.setInputType(InputType.TYPE_NULL);
+
+        context = this;
 
 
     }
@@ -591,6 +605,7 @@ public class VeryficationCodeActivity extends AppCompatActivity {
 
             case R.id.rldone:
 
+
                 if (mEd1.getText().toString().length() == 0 && mEd2.getText().toString().length() == 0 && mEd3.getText().toString().length() == 0 && mEd4.getText().toString().length() == 0) {
                     mEd1.setError("Enter otp");
                     mEd2.setError("Enter otp");
@@ -624,13 +639,16 @@ public class VeryficationCodeActivity extends AppCompatActivity {
 
 
 //                     Retrofit code
+                    networkConnection();
+                    flipProgress();
 
                     HttpModule.provideRepositoryService().getOtpNumberAPI(mEd1.getText().toString() + mEd2.getText().toString() + mEd3.getText().toString() + mEd4.getText().toString()).enqueue(new Callback<ResponseOtpNumber>() {
                         @Override
                         public void onResponse(Call<ResponseOtpNumber> call, Response<ResponseOtpNumber> response) {
 
-                            if (response.body().isSuccess) {
+                            if (response.body() != null || response.body().isSuccess) {
 
+                                fpd.dismiss();
                                 if (SystemClock.elapsedRealtime() - lastClickTime < 1000) {
                                     return;
                                 }
@@ -648,6 +666,7 @@ public class VeryficationCodeActivity extends AppCompatActivity {
                         @Override
                         public void onFailure(Call<ResponseOtpNumber> call, Throwable t) {
                             t.printStackTrace();
+                            fpd.dismiss();
                         }
                     });
 
@@ -655,6 +674,77 @@ public class VeryficationCodeActivity extends AppCompatActivity {
                 break;
 
         }
+    }
+
+    private void networkConnection() {
+
+        // 1st way of checking connectivity
+        ConnectivityManager mgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = mgr.getActiveNetworkInfo();
+
+        if (netInfo != null) {
+            if (netInfo.isConnected()) {
+                // Internet Available
+            } else {
+                //No internet
+                TastyToast.makeText(getApplicationContext() , "There is no internet Connection.." , TastyToast.LENGTH_SHORT ,TastyToast.SUCCESS).show();
+            }
+        } else {
+            //No internet
+            TastyToast.makeText(getApplicationContext() , "There is no internet Connection.." , TastyToast.LENGTH_SHORT ,TastyToast.SUCCESS).show();
+        }
+
+        // 2nd way of checking connectivity
+
+//        if (InternetConnection.checkConnection(context)) {
+//            // Internet Available...
+//            TastyToast.makeText(getApplicationContext() , "Internet Available" , TastyToast.LENGTH_SHORT, TastyToast.SUCCESS).show();
+//        } else {
+//            // Internet Not Available...
+//            TastyToast.makeText(getApplicationContext() , "No Internet Available" , TastyToast.LENGTH_SHORT, TastyToast.SUCCESS).show();
+//        }
+
+    }
+
+    private void flipProgress() {
+
+
+        // Set imageList
+        List<Integer> imageList = new ArrayList<Integer>();
+        imageList.add(R.drawable.foodorderfill);
+        fpd = new FlipProgressDialog();
+
+        fpd.setImageList(imageList);                              // *Set a imageList* [Have to. Transparent background png recommended]
+        fpd.setCanceledOnTouchOutside(true);                      // If true, the dialog will be dismissed when user touch outside of the dialog. If false, the dialog won't be dismissed.
+        fpd.setDimAmount(0.0f);                                   // Set a dim (How much dark outside of dialog)
+
+        // About dialog shape, color
+        fpd.setBackgroundColor(Color.parseColor("#e0e0e0"));      // Set a background color of dialog
+        fpd.setBackgroundAlpha(0.2f);                             // Set a alpha color of dialog
+        fpd.setBorderStroke(0);                                   // Set a width of border stroke of dialog
+        fpd.setBorderColor(-1);                                   // Set a border stroke color of dialog
+        fpd.setCornerRadius(16);                                  // Set a corner radius
+
+        // About image
+        fpd.setImageSize(200);                                    // Set an image size
+        fpd.setImageMargin(10);                                   // Set a margin of image
+
+        // About rotation
+        fpd.setOrientation("rotationY");                          // Set a flipping rotation
+        fpd.setDuration(600);                                     // Set a duration time of flipping ratation
+        fpd.setStartAngle(0.0f);                                  // Set an angle when flipping ratation start
+        fpd.setEndAngle(180.0f);                                  // Set an angle when flipping ratation end
+        fpd.setMinAlpha(0.0f);                                    // Set an alpha when flipping ratation start and end
+        fpd.setMaxAlpha(1.0f);                                    // Set an alpha while image is flipping
+
+
+        fpd.show(getFragmentManager(), "");                        // Show flip-progress-dialg
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
     }
 }
 

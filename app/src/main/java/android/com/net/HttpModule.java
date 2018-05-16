@@ -18,7 +18,7 @@ public class HttpModule {
         System.out.println("HttpModule.getOkkHttpClient - - - Shahzeb123 getOkkHttpClient ");
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(BuildConfig.DEBUG ? HttpLoggingInterceptor.Level.BODY : HttpLoggingInterceptor.Level.NONE);
-        return new OkHttpClient.Builder().addInterceptor(logging)/*.addNetworkInterceptor(new StethoInterceptor())*/.readTimeout(180, TimeUnit.SECONDS).build();
+        return new OkHttpClient.Builder()/*.addInterceptor(logging)*//*.addNetworkInterceptor(new StethoInterceptor())*/.readTimeout(180, TimeUnit.SECONDS).connectTimeout(180,TimeUnit.SECONDS).build();
 
     }
 
