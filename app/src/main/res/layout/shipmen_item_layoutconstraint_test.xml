@@ -57,34 +57,33 @@
 
 
                 <Button
-                    android:textStyle="italic"
-                    android:layout_marginTop="5dp"
-                    android:gravity="center"
                     android:id="@+id/information"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/first_linear"
+                    android:layout_marginTop="5dp"
+                    android:gravity="center"
                     android:text="View"
-                    android:theme="@style/AppThemeMaterial"
                     android:textColor="#ffffff"
-                    android:textSize="@dimen/_12sdp" />
-
+                    android:textSize="@dimen/_12sdp"
+                    android:textStyle="italic"
+                    android:theme="@style/AppThemeMaterial" />
 
 
                 <Button
 
-                    android:layout_toRightOf="@id/information"
-                    android:textStyle="italic"
-                    android:layout_marginTop="5dp"
-                    android:gravity="center"
                     android:id="@+id/reject"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/shipment_linear"
+                    android:layout_marginTop="5dp"
+                    android:layout_toRightOf="@id/information"
+                    android:gravity="center"
                     android:text="REJECT"
-                    android:theme="@style/AppThemeMaterialReject"
                     android:textColor="#ffffff"
-                    android:textSize="@dimen/_12sdp" />
+                    android:textSize="@dimen/_12sdp"
+                    android:textStyle="italic"
+                    android:theme="@style/AppThemeMaterialReject" />
 
 
                 <LinearLayout

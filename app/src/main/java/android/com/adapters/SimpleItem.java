@@ -24,6 +24,14 @@ public class SimpleItem extends AbstractItem<SimpleItem, SimpleItem.ViewHolder> 
         return shipment;
     }
 
+
+    public void setAccepted(boolean accepted) {
+        isAccepted = accepted;
+    }
+
+    private boolean isAccepted;
+
+
     public void setShipment(Shipment shipment) {
         this.shipment = shipment;
     }
@@ -80,6 +88,12 @@ public class SimpleItem extends AbstractItem<SimpleItem, SimpleItem.ViewHolder> 
             tv_Date.setText(item.shipment.getDate());
             tv_ShipmentNumber.setText(item.shipment.getShipMentNo());
 
+            if(item.isAccepted){
+                reject.setVisibility(View.GONE);
+
+            }else{
+                reject.setVisibility(View.VISIBLE);
+            }
 
             tv_Accept.setBackground(tv_Date.getContext().getResources().getDrawable(R.drawable.rounded_button_upcoming));
             tv_Accept.setText(item.getShipment().getTextViewState().getTextLable());

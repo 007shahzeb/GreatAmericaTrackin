@@ -91,10 +91,10 @@ public class MainActivity extends AppCompatActivity
     public void onClick(View v) {
 
         int id = v.getId();
+
         switch (id) {
             case R.id.im_Next: {
                 performImageNextOperationHere();
-
             }
         }
     }
@@ -117,11 +117,10 @@ public class MainActivity extends AppCompatActivity
                 @Override
                 public void onResponse(Call<ResponseDriverNumber> call, Response<ResponseDriverNumber> response) {
 
+                    fpd.dismiss();
+                    if (response.body() != null && response.body().isSuccess) {
 
-                    if (response.body() != null || response.body().isSuccess) {
 
-
-                        fpd.dismiss();
                         if (SystemClock.elapsedRealtime() - lastClickTime < 1000) {
                             return;
                         }
@@ -160,11 +159,11 @@ public class MainActivity extends AppCompatActivity
                 // Internet Available
             } else {
                 //No internet
-                TastyToast.makeText(getApplicationContext() , "There is no internet Connection.." , TastyToast.LENGTH_SHORT ,TastyToast.SUCCESS).show();
+                TastyToast.makeText(getApplicationContext(), "There is no internet Connection..", TastyToast.LENGTH_SHORT, TastyToast.SUCCESS).show();
             }
         } else {
             //No internet
-            TastyToast.makeText(getApplicationContext() , "There is no internet Connection.." , TastyToast.LENGTH_SHORT ,TastyToast.SUCCESS).show();
+            TastyToast.makeText(getApplicationContext(), "There is no internet Connection..", TastyToast.LENGTH_SHORT, TastyToast.SUCCESS).show();
         }
 
         // 2nd way of checking connectivity

@@ -645,21 +645,23 @@ public class VeryficationCodeActivity extends AppCompatActivity {
                     HttpModule.provideRepositoryService().getOtpNumberAPI(mEd1.getText().toString() + mEd2.getText().toString() + mEd3.getText().toString() + mEd4.getText().toString()).enqueue(new Callback<ResponseOtpNumber>() {
                         @Override
                         public void onResponse(Call<ResponseOtpNumber> call, Response<ResponseOtpNumber> response) {
+                            fpd.dismiss();
+                            if (response.body() != null) {
 
-                            if (response.body() != null || response.body().isSuccess) {
+                                if (response.body().isSuccess) {
+                                    fpd.dismiss();
+                                    if (SystemClock.elapsedRealtime() - lastClickTime < 1000) {
+                                        return;
+                                    }
+                                    lastClickTime = SystemClock.elapsedRealtime();
 
-                                fpd.dismiss();
-                                if (SystemClock.elapsedRealtime() - lastClickTime < 1000) {
-                                    return;
+                                    Intent intent = new Intent(VeryficationCodeActivity.this, ShipmenActivity.class);
+                                    startActivity(intent);
+                                    finish();
+                                } else {
+                                    TastyToast.makeText(VeryficationCodeActivity.this, response.body().message, TastyToast.LENGTH_LONG, TastyToast.WARNING).show();
                                 }
-                                lastClickTime = SystemClock.elapsedRealtime();
 
-                                Intent intent = new Intent(VeryficationCodeActivity.this, ShipmenActivity.class);
-                                startActivity(intent);
-                                finish();
-
-                            } else {
-                                TastyToast.makeText(VeryficationCodeActivity.this, response.body().message, TastyToast.LENGTH_LONG, TastyToast.WARNING).show();
                             }
                         }
 
@@ -687,11 +689,11 @@ public class VeryficationCodeActivity extends AppCompatActivity {
                 // Internet Available
             } else {
                 //No internet
-                TastyToast.makeText(getApplicationContext() , "There is no internet Connection.." , TastyToast.LENGTH_SHORT ,TastyToast.SUCCESS).show();
+                TastyToast.makeText(getApplicationContext(), "There is no internet Connection..", TastyToast.LENGTH_SHORT, TastyToast.SUCCESS).show();
             }
         } else {
             //No internet
-            TastyToast.makeText(getApplicationContext() , "There is no internet Connection.." , TastyToast.LENGTH_SHORT ,TastyToast.SUCCESS).show();
+            TastyToast.makeText(getApplicationContext(), "There is no internet Connection..", TastyToast.LENGTH_SHORT, TastyToast.SUCCESS).show();
         }
 
         // 2nd way of checking connectivity
