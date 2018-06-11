@@ -655,6 +655,7 @@ public class VeryficationCodeActivity extends AppCompatActivity {
                                     }
                                     lastClickTime = SystemClock.elapsedRealtime();
 
+                                    System.out.println("VeryficationCodeActivity.onResponse - - - Testing heer ");
                                     Intent intent = new Intent(VeryficationCodeActivity.this, ShipmenActivity.class);
                                     startActivity(intent);
                                     finish();
@@ -667,6 +668,7 @@ public class VeryficationCodeActivity extends AppCompatActivity {
 
                         @Override
                         public void onFailure(Call<ResponseOtpNumber> call, Throwable t) {
+                            System.out.println("VeryficationCodeActivity.onFailure - - " + t);
                             t.printStackTrace();
                             fpd.dismiss();
                         }

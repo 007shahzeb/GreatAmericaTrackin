@@ -179,7 +179,7 @@
 
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Load Number -"
+                            android:text="Pickup number -"
                             android:textColor="#000"
                             android:textSize="@dimen/_12sdp"
                             android:textStyle="italic" />
@@ -515,7 +515,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Pickup Number -"
+                            android:text="Delivery number -"
                             android:textColor="#000"
                             android:textSize="@dimen/_12sdp"
                             android:textStyle="italic" />

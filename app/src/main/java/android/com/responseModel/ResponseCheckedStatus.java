@@ -7,7 +7,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-public class ResponseCheckedStatus {
+public class  ResponseCheckedStatus {
     Context context;
 
     public ResponseCheckedStatus(Context context) {
@@ -47,7 +47,7 @@ public class ResponseCheckedStatus {
 
     @SerializedName("Status")
     @Expose
-    public String status;
+    public Integer status;
 
     @SerializedName("Destination")
     @Expose

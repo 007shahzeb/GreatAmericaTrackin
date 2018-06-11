@@ -40,18 +40,6 @@ public class ShipmentDetail {
     }
 
     public String getDeliveryDate() {
-
-//        // converting date into proper format
-//        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-//        SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd");
-//        String date=null;
-//        try {
-//            Date newDate=simpleDateFormat.parse(deliveryDate);
-//            date= outputFormat.format(newDate);
-//        } catch (ParseException e) {
-//            e.printStackTrace();
-//        }
-
         return deliveryDate;
     }
 

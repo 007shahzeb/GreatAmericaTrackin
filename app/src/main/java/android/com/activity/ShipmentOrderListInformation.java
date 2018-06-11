@@ -17,6 +17,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -25,6 +28,7 @@ import java.util.List;
 public class ShipmentOrderListInformation extends AppCompatActivity {
 
     public RecyclerView recyclerView_shipment_order_list;
+    private ImageView backarrow_info;
 
 
     List<ShipperList> shipmentOrderListInfos;
@@ -32,6 +36,7 @@ public class ShipmentOrderListInformation extends AppCompatActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        hidingStatusBar();
         super.onCreate(savedInstanceState);
 
         if (getIntent() != null) {
@@ -40,6 +45,8 @@ public class ShipmentOrderListInformation extends AppCompatActivity {
 
                 shipmentOrderListInfos = (List<ShipperList>) getIntent().getSerializableExtra("shipmemntlist");
                 reciverListInfos = (List<ReceiverList>) getIntent().getSerializableExtra("recivierlist");
+                System.out.println("ShipmentOrderListInformation.onCreate 1- - " + shipmentOrderListInfos);
+                System.out.println("ShipmentOrderListInformation.onCreate 2- - " + reciverListInfos);
             }
         }
         setContentView(R.layout.shipment_order_list_information);
@@ -54,10 +61,28 @@ public class ShipmentOrderListInformation extends AppCompatActivity {
         } finally {
 
         }
+
+
+        backarrow_info.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                finish();
+            }
+        });
+
+    }
+
+    private void hidingStatusBar() {
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
     }
 
     private void findingIdsHere() {
         System.out.println("ShipmentOrderListInformation.findingIdsHere");
+        backarrow_info = findViewById(R.id.backarrow_info);
+
         recyclerView_shipment_order_list = findViewById(R.id.recyclerView_shipment_order_list);
         recyclerView_shipment_order_list.setHasFixedSize(true);
         recyclerView_shipment_order_list.setLayoutManager(new LinearLayoutManager(this));
@@ -77,7 +102,7 @@ public class ShipmentOrderListInformation extends AppCompatActivity {
                     @Override
                     public void onItemClick(View v, int position) {
 
-                        Toast.makeText(getApplicationContext(), "Testing Single Item Clicked", Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(getApplicationContext(), "Testing Single Item Clicked", Toast.LENGTH_SHORT).show();
 
                     }
                 });

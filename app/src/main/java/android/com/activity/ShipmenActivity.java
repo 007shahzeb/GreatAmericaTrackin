@@ -1,19 +1,21 @@
 package android.com.activity;
 
 import android.Manifest;
-import android.app.AlertDialog;
+import android.annotation.SuppressLint;
+import android.com.DonationAdapter;
+import android.com.DonationOption;
 import android.com.adapters.SimpleItem;
 import android.com.garytransportnew.R;
 import android.com.models.Shipment;
 import android.com.models.TextViewState;
 import android.com.net.HttpModule;
-import android.com.responseModel.LocationAPI;
 import android.com.responseModel.ResponseCheckedStatus;
+import android.com.responseModel.ResponseGetOrderRejected;
 import android.com.responseModel.ResponseReachedCheckStatus;
 import android.com.responseModel.ResponseRealTimeLocationCheckedStatus;
-import android.com.responseModel.ResponseRejectAPI;
 import android.com.responseModel.ResponseShipmentInformation;
 import android.com.responseModel.ResponseShipmentList;
+import android.com.responseModel.ShipmentDetail;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -21,8 +23,8 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.Looper;
+import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -30,9 +32,9 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.method.NumberKeyListener;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -53,6 +55,9 @@ import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter;
 import com.mikepenz.fastadapter.listeners.ClickEventHook;
 import com.sdsmdg.tastytoast.TastyToast;
 import com.taishi.flipprogressdialog.FlipProgressDialog;
+import com.yarolegovich.lovelydialog.LovelyChoiceDialog;
+import com.yarolegovich.lovelydialog.LovelyCustomDialog;
+import com.yarolegovich.lovelydialog.LovelyStandardDialog;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -69,7 +74,7 @@ public class ShipmenActivity extends AppCompatActivity implements GoogleApiClien
 
     Location mLocation;
     TextView latLng;
-    GoogleApiClient mGoogleApiClient;
+    GoogleApiClient mGoogleApiClient = null;
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
     private LocationRequest mLocationRequest;
@@ -83,7 +88,7 @@ public class ShipmenActivity extends AppCompatActivity implements GoogleApiClien
     private final static int ALL_PERMISSIONS_RESULT = 101;
 
     private RecyclerView recycler_view;
-    private FastItemAdapter<SimpleItem> fastAdapter;
+    public static FastItemAdapter<SimpleItem> fastAdapter;
     String message;
     String orderId;
     String rEceiverId;
@@ -100,6 +105,8 @@ public class ShipmenActivity extends AppCompatActivity implements GoogleApiClien
     public Boolean reachedStatus = false;
     private SpotsDialog dialog = null;
     private SimpleItem itemChange;
+    private long lastClickTime = 0;
+    int pos;
 
 
     @Override
@@ -110,8 +117,18 @@ public class ShipmenActivity extends AppCompatActivity implements GoogleApiClien
 
     @Override
     public void onResume() {
-
         super.onResume();
+        performingOperationsHere();
+    }
+
+    private List<DonationOption> loadDonationOptions() {
+        List<DonationOption> result = new ArrayList<>();
+        String[] raw = getResources().getStringArray(R.array.donations);
+        for (String op : raw) {
+            String[] info = op.split("%");
+            result.add(new DonationOption(info[1], info[0]));
+        }
+        return result;
     }
 
 
@@ -119,9 +136,9 @@ public class ShipmenActivity extends AppCompatActivity implements GoogleApiClien
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.shipmen_layout);
-        flipProgress();
+//        flipProgress();
         findingIdsHere();
-        performingOperationsHere();
+
 
         try {
             // Hiding Action in a particular Activity
@@ -131,39 +148,56 @@ public class ShipmenActivity extends AppCompatActivity implements GoogleApiClien
 
         }
         context = this;
-
-
     }
 
     private void findingIdsHere() {
         recycler_view = findViewById(R.id.recycler_view);
     }
 
+    List<ShipmentDetail> tempListShipment = new ArrayList<>();
+
     private void performingOperationsHere() {
 
         HttpModule.provideRepositoryService().getShipmentListAPI(MainActivity.enteredMobileNumber).enqueue(new Callback<ResponseShipmentList>() {
             @Override
             public void onResponse(Call<ResponseShipmentList> call, Response<ResponseShipmentList> response) {
-                fpd.dismiss();
+//                fpd.dismiss();
 
                 if (response.body() != null) {
 
                     if (response.body().isSuccess) {
+
                         if (response.body().shipmentDetail.size() > 0) {
 
                             for (int i = 0; i < response.body().shipmentDetail.size(); i++) {
 
-                                if (i == 0) {
+                                fastAdapter.add(new SimpleItem(new Shipment(response.body().shipmentDetail.get(i).getDeliveryDate(), response.body().shipmentDetail.get(i).orderid + "", response.body().shipmentDetail.get(i).statusid)));
 
-                                    orderId = response.body().shipmentDetail.get(i).orderid.toString();
-                                    System.out.println("ShipmenActivity.onResponse - - - OREDER ID IS " + orderId);
-                                    System.out.println("ShipmenActivity.onResponse - value of - " + i);
 
-                                    fastAdapter.add(new SimpleItem(new Shipment(response.body().shipmentDetail.get(i).getDeliveryDate(), response.body().shipmentDetail.get(i).orderid + "", new TextViewState(R.color.acceptColorCode, "ACCEPT"))));
-                                } else {
-                                    fastAdapter.add(new SimpleItem(new Shipment(response.body().shipmentDetail.get(i).getDeliveryDate(), response.body().shipmentDetail.get(i).orderid + "", new TextViewState(R.color.upcomingColorCode, "UPCOMING"))));
-                                }
                             }
+
+/*
+
+                            for (int i = 0; i < response.body().shipmentDetail.size(); i++) {
+
+                                if (response.body().shipmentDetail.get(i).getStatusid() != 3)  // not done check
+                                {
+                                    tempListShipment.add(response.body().shipmentDetail.get(i));
+                                    continue;
+                                }
+
+
+                            }
+
+
+                            for (int i = 0; i < tempListShipment.size(); i++) {
+
+                                if (i == 0) {
+                                    fastAdapter.add(new SimpleItem(new Shipment(tempListShipment.get(i).getDeliveryDate(), tempListShipment.get(i).orderid + "", tempListShipment.get(i).statusid)));
+                                } else {
+                                    fastAdapter.add(new SimpleItem(new Shipment(tempListShipment.get(i).getDeliveryDate(), tempListShipment.get(i).orderid + "", tempListShipment.get(i).statusid)));
+                                }
+                            }*/
                         }
                     } else {
                         TastyToast.makeText(ShipmenActivity.this, response.body().message, TastyToast.LENGTH_LONG, TastyToast.WARNING).show();
@@ -174,220 +208,229 @@ public class ShipmenActivity extends AppCompatActivity implements GoogleApiClien
 
             @Override
             public void onFailure(Call<ResponseShipmentList> call, Throwable t) {
-                fpd.dismiss();
+//                fpd.dismiss();
                 t.printStackTrace();
             }
 
 
         });
 
-
         recycler_view.setHasFixedSize(true);
         recycler_view.setLayoutManager(new LinearLayoutManager(this));
         fastAdapter = new FastItemAdapter<>();
         recycler_view.setAdapter(fastAdapter);
 
-
         fastAdapter.withSelectable(true);
 
-
         fastAdapter.withEventHook(new ClickEventHook<SimpleItem>() {
+            @SuppressLint("MissingPermission")
             @Override
-            public void onClick(final View v, final int position, final FastAdapter<SimpleItem> fastAdapter, final SimpleItem item) {
+            public void onClick(final View v, final int position, final FastAdapter<SimpleItem> fastAdapter1, final SimpleItem item) {
+
                 itemChange = item;
+                pos = position;
+                orderId = item.getShipment().getShipMentNo();
                 switch (v.getId()) {
 
                     case R.id.upload_file:
-                        finish();
-//                        final Intent intent = new Intent(ShipmenActivity.this, UploadImageActivity.class);
+
+//                        Intent intent = new Intent(ShipmenActivity.this, UploadImageActivity.class);
 //                        startActivity(intent);
+//                        fastAdapter.remove(position); // Integer.parseInt(orderId)
+                        //finish();
 
-
-                        Intent intent = new Intent(ShipmenActivity.this, UploadImageActivity.class);
+                     /*   Intent intent = new Intent(ShipmenActivity.this, UploadImageActivity.class);
                         // set the new task and clear flags
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        startActivity(intent);
+                        startActivity(intent);*/
 
                         break;
 
                     case R.id.tv_Accept: {
 
 
-                        if (!reachedStatus) {
-                            if (dialog == null) {
-                                dialog = new SpotsDialog(context);
-                                dialog.setCancelable(false);
-                                dialog.show();
-
-
-                            } else dialog.show();
-                        }
-
-                        int[] positionArray = new int[position];
-
-                        if (positionArray.length >= 0) {
-
-                            new CountDownTimer(0, 0) {
-                                @Override
-                                public void onTick(long millisUntilFinished) {
-
-                                }
-
-                                @Override
-                                public void onFinish() {
-
-//                                    if (item.getShipment().getTextViewState().getTextLable().equalsIgnoreCase("UPCOMING")) {
-//                                        item.getShipment().getTextViewState().setColor(R.color.acceptColorCode);
-//                                        item.getShipment().getTextViewState().setTextLable("ACCEPT");
-//                                        fastAdapter.notifyAdapterItemChanged(position);
+//                        if (!reachedStatus) {
+//                            if (dialog == null) {
+//                                dialog = new SpotsDialog(context);
+//                                dialog.setCancelable(false);
+//                                dialog.show();
 //
-//                                    } else
-                                    if (item.getShipment().getTextViewState().getTextLable().equalsIgnoreCase("ACCEPT")) {
-                                        item.setAccepted(true);
-                                        fastAdapter.notifyAdapterDataSetChanged();
-
-                                        HttpModule.provideRepositoryService().getCheckedStatusAPI(orderId).enqueue(new Callback<ResponseCheckedStatus>() {
-                                            @Override
-                                            public void onResponse(Call<ResponseCheckedStatus> call, Response<ResponseCheckedStatus> response) {
-                                                fpd.dismiss();
-                                                dialog.dismiss();
-                                                if (response.body() != null) {
-                                                    System.out.println("ShipmenActivity.onResponse - - -ACCEPT");
-
-                                                    if (response.body().isSuccess) {
-
-                                                        String status = response.body().status;
-                                                        receiverlatitude = response.body().destination.lat;
-                                                        receiverLongitude = response.body().destination.lng;
-                                                        rEceiverId = response.body().destination.id.toString();
-
-                                                        System.out.println("ShipmenActivity.onResponse - -- " + receiverlatitude);
-                                                        System.out.println("ShipmenActivity.onResponse - -- " + receiverLongitude);
-                                                        System.out.println("ShipmenActivity.onResponse - -- " + rEceiverId);
-
-
-                                                        if (response.body().status.equalsIgnoreCase(status)) {
-
-                                                            item.getShipment().getTextViewState().setColor(R.color.onthewatColorCode);
-                                                            item.getShipment().getTextViewState().setTextLable("ON THE WAY");
-                                                            fastAdapter.notifyAdapterItemChanged(position);
-                                                        }
-                                                    } else {
-                                                        TastyToast.makeText(ShipmenActivity.this, response.body().message, TastyToast.LENGTH_LONG, TastyToast.WARNING).show();
-                                                    }
-                                                }
-                                            }
-
-                                            @Override
-                                            public void onFailure(Call<ResponseCheckedStatus> call, Throwable t) {
-                                                System.out.println("ShipmenActivity.onFailure - - " + t);
-                                                fpd.dismiss();
-                                                dialog.dismiss();
-                                            }
-                                        });
-
-                                    }
-
-//                                    else
-
-                                    if (item.getShipment().getTextViewState().getTextLable().equalsIgnoreCase("ON THE WAY")) {
-
-
-                                        // Location prompt starts
-
-                                        final String REQUEST_CHECK_SETTINGS = "1";
-
-                                        GoogleApiClient googleApiClient = new GoogleApiClient.Builder(context)
-                                                .addApi(LocationServices.API).build();
-                                        googleApiClient.connect();
-
-                                        LocationRequest locationRequest = LocationRequest.create();
-                                        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-                                        locationRequest.setInterval(10000);
-                                        locationRequest.setFastestInterval(10000 / 2);
-
-                                        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
-                                        builder.setAlwaysShow(true);
-
-                                        PendingResult<LocationSettingsResult> result = LocationServices.SettingsApi.checkLocationSettings(googleApiClient, builder.build());
-                                        result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
-                                            @Override
-                                            public void onResult(LocationSettingsResult result) {
-                                                final Status status = result.getStatus();
-                                                switch (status.getStatusCode()) {
-                                                    case LocationSettingsStatusCodes.SUCCESS:
-                                                        Log.i(TAG, "All location settings are satisfied.");
-                                                        break;
-                                                    case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                                                        Log.i(TAG, "Location settings are not satisfied. Show the user a dialog to upgrade location settings ");
-
-                                                        try {
-                                                            // Show the dialog by calling startResolutionForResult(), and check the result
-                                                            // in onActivityResult().
-                                                            status.startResolutionForResult(ShipmenActivity.this, Integer.parseInt(REQUEST_CHECK_SETTINGS));
-                                                        } catch (IntentSender.SendIntentException e) {
-                                                            Log.i(TAG, "PendingIntent unable to execute request.");
-                                                        }
-                                                        break;
-                                                    case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-                                                        Log.i(TAG, "Location settings are inadequate, and cannot be fixed here. Dialog not created.");
-                                                        break;
-                                                }
-                                            }
-                                        });
-
-                                        // Location prompt end here
-
-                                        if (!reachedStatus) {
-                                            v.setClickable(false);
-                                            HttpModule.provideRepositoryService().getRealTimeLocationCheckedStatusAPI(orderId, rEceiverId, receiverlatitude, receiverLongitude).enqueue(new Callback<ResponseRealTimeLocationCheckedStatus>() {
-                                                @Override
-                                                public void onResponse(Call<ResponseRealTimeLocationCheckedStatus> call, Response<ResponseRealTimeLocationCheckedStatus> response) {
-                                                    dialog.dismiss();
-                                                    if (response.body() != null && response.body().isSuccess) {
-
-                                                        buildGoogleApiClient();
-                                                        mGoogleApiClient.connect();
-//                                                        Toast.makeText(getApplicationContext(), response.body().message, Toast.LENGTH_SHORT).show();
-                                                    }
-                                                }
-
-                                                @Override
-                                                public void onFailure(Call<ResponseRealTimeLocationCheckedStatus> call, Throwable t) {
-                                                    System.out.println("ShipmenActivity.onFailure - - -" + t);
-                                                    dialog.dismiss();
-                                                }
-                                            });
-                                        }
-
-                                    }
-
-
-                                }
-                            }.start();
-
-                        }
-
-                        break;
+//                            } else dialog.show();
+//                        }
+//
+//                        if (item.getShipment().getTextViewState().getTextLable().equalsIgnoreCase("ACCEPT")) {
+//                            item.setAccepted(true);
+//                            fastAdapter.notifyAdapterDataSetChanged();
+//
+//                            HttpModule.provideRepositoryService().getCheckedStatusAPI(orderId).enqueue(new Callback<ResponseCheckedStatus>() {
+//                                @Override
+//                                public void onResponse(Call<ResponseCheckedStatus> call, Response<ResponseCheckedStatus> response) {
+//                                    fpd.dismiss();
+//                                    dialog.dismiss();
+//                                    if (response.body() != null) {
+//
+//                                        if (response.body().isSuccess) {
+//
+//                                            String status = response.body().status;
+//                                            receiverlatitude = response.body().destination.lat;
+//                                            receiverLongitude = response.body().destination.lng;
+//                                            rEceiverId = response.body().destination.id.toString();
+//
+//                                            if (response.body().status.equalsIgnoreCase(status)) {
+//
+//                                                item.getShipment().getTextViewState().setColor(R.color.onthewatColorCode);
+//                                                item.getShipment().getTextViewState().setTextLable("ON THE WAY");
+//                                                fastAdapter.notifyAdapterItemChanged(position);
+//                                            }
+//                                        } else {
+//                                            TastyToast.makeText(ShipmenActivity.this, response.body().message, TastyToast.LENGTH_LONG, TastyToast.WARNING).show();
+//                                        }
+//                                    }
+//                                }
+//
+//                                @Override
+//                                public void onFailure(Call<ResponseCheckedStatus> call, Throwable t) {
+//                                    System.out.println("ShipmenActivity.onFailure - - " + t);
+//                                    fpd.dismiss();
+//                                    dialog.dismiss();
+//                                }
+//                            });
+//                        }
+//
+//                        if (item.getShipment().getTextViewState().getTextLable().equalsIgnoreCase("ON THE WAY")) {
+//
+//
+//                            // Location prompt starts
+//
+//                            final String REQUEST_CHECK_SETTINGS = "1";
+//
+//                            if (mGoogleApiClient == null) {
+//                                mGoogleApiClient = new GoogleApiClient.Builder(context)
+//                                        .addApi(LocationServices.API).build();
+//
+//                                mGoogleApiClient.connect();
+//
+//                            } else {
+//                                try {
+//                                    LocationServices.getFusedLocationProviderClient(getApplicationContext()).requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper());
+//                                } catch (Exception e) {
+//                                    e.printStackTrace();
+//                                }
+//                            }
+//
+//
+//                            LocationRequest locationRequest = LocationRequest.create();
+//                            locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+//                            locationRequest.setInterval(10000);
+//                            locationRequest.setFastestInterval(10000 / 2);
+//
+//                            LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
+//                            builder.setAlwaysShow(true);
+//
+//                            PendingResult<LocationSettingsResult> result = LocationServices.SettingsApi.checkLocationSettings(mGoogleApiClient, builder.build());
+//                            result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
+//                                @Override
+//                                public void onResult(LocationSettingsResult result) {
+//                                    final Status status = result.getStatus();
+//                                    switch (status.getStatusCode()) {
+//                                        case LocationSettingsStatusCodes.SUCCESS:
+//                                            Log.i(TAG, "All location settings are satisfied.");
+//                                            break;
+//                                        case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+//                                            Log.i(TAG, "Location settings are not satisfied. Show the user a dialog to upgrade location settings ");
+//
+//                                            try {
+//                                                // Show the dialog by calling startResolutionForResult(), and check the result
+//                                                // in onActivityResult().
+//                                                status.startResolutionForResult(ShipmenActivity.this, Integer.parseInt(REQUEST_CHECK_SETTINGS));
+//                                            } catch (IntentSender.SendIntentException e) {
+//                                                Log.i(TAG, "PendingIntent unable to execute request.");
+//                                            }
+//                                            break;
+//                                        case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+//                                            Log.i(TAG, "Location settings are inadequate, and cannot be fixed here. Dialog not created.");
+//                                            break;
+//                                    }
+//                                }
+//                            });
+//
+//                            // Location prompt end here
+//
+//                            if (!reachedStatus) {
+//
+//                                v.setClickable(false);
+//
+//                                HttpModule.provideRepositoryService().getRealTimeLocationCheckedStatusAPI(orderId, rEceiverId, receiverlatitude, receiverLongitude).enqueue(new Callback<ResponseRealTimeLocationCheckedStatus>() {
+//                                    @Override
+//                                    public void onResponse(Call<ResponseRealTimeLocationCheckedStatus> call, Response<ResponseRealTimeLocationCheckedStatus> response) {
+//                                        dialog.dismiss();
+//                                        if (response.body() != null && response.body().isSuccess) {
+//
+//                                            buildGoogleApiClient();
+//                                            mGoogleApiClient.connect();
+//                                        }
+//                                    }
+//
+//                                    @Override
+//                                    public void onFailure(Call<ResponseRealTimeLocationCheckedStatus> call, Throwable t) {
+//                                        System.out.println("ShipmenActivity.onFailure - - -" + t);
+//                                        dialog.dismiss();
+//                                    }
+//                                });
+//                            }
+//
+//                        }
+//                        break;
                     }
 
 
                     case R.id.reject: {
 
-//                        rejectingCase();
+
+//                        if (SystemClock.elapsedRealtime() - lastClickTime < 1000) {
+//                            return;
+//                        }
+//                        lastClickTime = SystemClock.elapsedRealtime();
+//
+//
+//                        new LovelyStandardDialog(context, LovelyStandardDialog.ButtonLayout.VERTICAL)
+//                                .setTopColorRes(R.color.colorAccent)
+//                                .setButtonsColorRes(R.color.colorPrimaryDark)
+//                                .setIcon(R.drawable.app_icon)
+//                                .setTitle(R.string.donate_title)
+//                                .setPositiveButton(android.R.string.ok, new View.OnClickListener() {
+//                                    @Override
+//                                    public void onClick(View v) {
+//                                        rejectingOrder();
+//                                    }
+//                                })
+//                                .setNegativeButton(android.R.string.no, new View.OnClickListener() {
+//                                    @Override
+//                                    public void onClick(View v) {
+//                                        TastyToast.makeText(getApplicationContext(), "Cancelled", TastyToast.LENGTH_SHORT, TastyToast.SUCCESS).show();
+//                                    }
+//                                })
+//                                .show();
+//
+//                        break;
 
                     }
 
-                    case R.id.information:
+                    case R.id.information: {
 
-                        flipProgress();
 
+                        if (SystemClock.elapsedRealtime() - lastClickTime < 1000) {
+                            return;
+                        }
+                        lastClickTime = SystemClock.elapsedRealtime();
+
+//                        flipProgress();
                         HttpModule.provideRepositoryService().getShipperReciverListAPI(orderId).enqueue(new Callback<ResponseShipmentInformation>() {
 
                             @Override
                             public void onResponse(Call<ResponseShipmentInformation> call, Response<ResponseShipmentInformation> response) {
 
-                                fpd.dismiss();
+//                                fpd.dismiss();
                                 if (response.body() != null && response.body().isSuccess) {
 
 
@@ -412,7 +455,8 @@ public class ShipmenActivity extends AppCompatActivity implements GoogleApiClien
                                 fpd.dismiss();
                             }
                         });
-
+                        break;
+                    }
                 }
 
 
@@ -423,10 +467,10 @@ public class ShipmenActivity extends AppCompatActivity implements GoogleApiClien
             public List<View> onBindMany(RecyclerView.ViewHolder viewHolder) {
                 List<View> views = new ArrayList<>();
 
-                views.add(((SimpleItem.ViewHolder) viewHolder).tv_Accept);
-                views.add(((SimpleItem.ViewHolder) viewHolder).upload_file);
+//                views.add(((SimpleItem.ViewHolder) viewHolder).tv_Accept);
+//                views.add(((SimpleItem.ViewHolder) viewHolder).upload_file);
                 views.add(((SimpleItem.ViewHolder) viewHolder).information);
-                views.add(((SimpleItem.ViewHolder) viewHolder).reject);
+//                views.add(((SimpleItem.ViewHolder) viewHolder).reject);
 
 
                 return views;
@@ -435,18 +479,24 @@ public class ShipmenActivity extends AppCompatActivity implements GoogleApiClien
 
     }
 
-    private void rejectingCase() {
+    private void rejectingOrder() {
 
-        HttpModule.provideRepositoryService().getRejectAPI("").enqueue(new Callback<ResponseRejectAPI>() {
+        HttpModule.provideRepositoryService().getOrderRejectedAPI(orderId).enqueue(new Callback<ResponseGetOrderRejected>() {
             @Override
-            public void onResponse(Call<ResponseRejectAPI> call, Response<ResponseRejectAPI> response) {
+            public void onResponse(Call<ResponseGetOrderRejected> call, Response<ResponseGetOrderRejected> response) {
 
-                System.out.println("ShipmenActivity.onResponse");
+                if (response.body().isSuccess) {
+                    TastyToast.makeText(getApplicationContext(), response.body().getMessage(), TastyToast.LENGTH_SHORT, TastyToast.SUCCESS).show();
+                } else {
+
+                    TastyToast.makeText(getApplicationContext(), "Getting False Value", TastyToast.LENGTH_SHORT, TastyToast.SUCCESS).show();
+                }
             }
 
             @Override
-            public void onFailure(Call<ResponseRejectAPI> call, Throwable t) {
-                System.out.println("ShipmenActivity.onFailure");
+            public void onFailure(Call<ResponseGetOrderRejected> call, Throwable t) {
+
+                System.out.println("ShipmenActivity.onFailure - - " + t);
 
             }
         });
@@ -565,8 +615,8 @@ public class ShipmenActivity extends AppCompatActivity implements GoogleApiClien
 
         if (mGoogleApiClient != null) {
             LocationServices.getFusedLocationProviderClient(getApplicationContext()).removeLocationUpdates(mLocationCallback);
-            mGoogleApiClient.disconnect();
-            mGoogleApiClient = null;
+          /*  mGoogleApiClient.disconnect();
+            mGoogleApiClient = null;*/
 
         }
 
@@ -579,11 +629,11 @@ public class ShipmenActivity extends AppCompatActivity implements GoogleApiClien
             @Override
             public void onResponse(Call<ResponseReachedCheckStatus> call, Response<ResponseReachedCheckStatus> response) {
 
-                if (response.body() != null && response.body().isSuccess) {
+                if (response.body().isSuccess) {
 
                     itemChange.getShipment().getTextViewState().setColor(R.color.reachedColorCode);
                     itemChange.getShipment().getTextViewState().setTextLable("REACHED");
-                    fastAdapter.notifyAdapterItemChanged(0);
+                    fastAdapter.notifyAdapterItemChanged(pos);
                     dialog.dismiss();
                     reachedStatus = response.body().isSuccess;
                     System.out.println("ShipmenActivity.onResponse - - " + reachedStatus);

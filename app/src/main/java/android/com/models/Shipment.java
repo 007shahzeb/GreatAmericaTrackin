@@ -7,13 +7,27 @@ import java.util.List;
 public class Shipment {
 
 
-    private String deliveryDate, shipMentNo, statusId;
+    private String deliveryDate;
+    private String shipMentNo;
+    private Integer statusId;
     private TextViewState upcoming;
 
-    public Shipment(String date, String shipMentNo, TextViewState upcoming) {
+
+
+    public Integer getStatusId() {
+        return statusId;
+    }
+
+    public void setStatusId(Integer statusId) {
+        this.statusId = statusId;
+    }
+
+
+    public Shipment(String date, String shipMentNo, Integer statusId) {
         this.deliveryDate = date;
         this.shipMentNo = shipMentNo;
         this.upcoming = upcoming;
+        this.statusId = statusId;
     }
 
     public TextViewState getTextViewState() {

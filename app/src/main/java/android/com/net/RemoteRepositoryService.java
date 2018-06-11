@@ -1,31 +1,23 @@
 package android.com.net;
 
-import android.com.responseModel.LocationAPI;
 import android.com.responseModel.ResponseCheckedStatus;
 import android.com.responseModel.ResponseDriverNumber;
 import android.com.responseModel.ResponseOtpNumber;
 import android.com.responseModel.ResponseReachedCheckStatus;
 import android.com.responseModel.ResponseRealTimeLocationCheckedStatus;
-import android.com.responseModel.ResponseRejectAPI;
+import android.com.responseModel.ResponseGetOrderRejected;
 import android.com.responseModel.ResponseShipmentInformation;
 import android.com.responseModel.ResponseShipmentList;
 import android.com.responseModel.ResponseUploadDocumnets;
 
-import java.util.HashMap;
-
 import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
-import retrofit2.http.Body;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
-import retrofit2.http.GET;
-import retrofit2.http.Headers;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
-import retrofit2.http.Path;
 
 public interface RemoteRepositoryService {
 
@@ -82,8 +74,8 @@ public interface RemoteRepositoryService {
 
 
     @FormUrlEncoded
-    @POST("reachedCheck/")
-    Call<ResponseRejectAPI> getRejectAPI(@Field("orderid") String order_Id);
+    @POST("RejectOrder/")
+    Call<ResponseGetOrderRejected> getOrderRejectedAPI(@Field("orderid") String order_Id);
 
 
 //    @Multipart
