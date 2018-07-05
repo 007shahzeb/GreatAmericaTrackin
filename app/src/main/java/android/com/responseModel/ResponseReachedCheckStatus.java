@@ -9,9 +9,11 @@ public class ResponseReachedCheckStatus {
     @SerializedName("isSuccess")
     @Expose
     public Boolean isSuccess;
+
     @SerializedName("message")
     @Expose
     public String message;
+
     @SerializedName("Status")
     @Expose
     public Boolean status;

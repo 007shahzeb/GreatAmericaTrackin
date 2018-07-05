@@ -3,6 +3,7 @@ package android.com.net;
 import android.com.garytransportnew.BuildConfig;
 
 import com.google.gson.GsonBuilder;
+import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
 import java.util.concurrent.TimeUnit;
 
@@ -25,6 +26,7 @@ public class HttpModule {
     public static Retrofit getRetroFitClient() {
         return new Retrofit.Builder()
                 .baseUrl("http://34.234.186.44:4000/driverapp/")
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create()) // Shahzeb added this to use RxJava
                 .addConverterFactory(GsonConverterFactory.create(new GsonBuilder().setLenient().create()))
                 .client(getOkkHttpClient())
                 .build();

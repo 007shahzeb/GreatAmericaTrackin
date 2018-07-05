@@ -69,8 +69,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class ShipmenActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener {
+public class ShipmenActivity extends AppCompatActivity {  // implements GoogleApiClient.ConnectionCallbacks,
+//    GoogleApiClient.OnConnectionFailedListener
 
     Location mLocation;
     TextView latLng;
@@ -147,6 +147,8 @@ public class ShipmenActivity extends AppCompatActivity implements GoogleApiClien
         } finally {
 
         }
+
+
         context = this;
     }
 
@@ -154,9 +156,12 @@ public class ShipmenActivity extends AppCompatActivity implements GoogleApiClien
         recycler_view = findViewById(R.id.recycler_view);
     }
 
-    List<ShipmentDetail> tempListShipment = new ArrayList<>();
+//    List<ShipmentDetail> tempListShipment = new ArrayList<>();
 
     private void performingOperationsHere() {
+
+
+
 
         HttpModule.provideRepositoryService().getShipmentListAPI(MainActivity.enteredMobileNumber).enqueue(new Callback<ResponseShipmentList>() {
             @Override
@@ -171,33 +176,42 @@ public class ShipmenActivity extends AppCompatActivity implements GoogleApiClien
 
                             for (int i = 0; i < response.body().shipmentDetail.size(); i++) {
 
-                                fastAdapter.add(new SimpleItem(new Shipment(response.body().shipmentDetail.get(i).getDeliveryDate(), response.body().shipmentDetail.get(i).orderid + "", response.body().shipmentDetail.get(i).statusid)));
-
-
-                            }
-
-/*
-
-                            for (int i = 0; i < response.body().shipmentDetail.size(); i++) {
-
-                                if (response.body().shipmentDetail.get(i).getStatusid() != 3)  // not done check
-                                {
-                                    tempListShipment.add(response.body().shipmentDetail.get(i));
-                                    continue;
-                                }
-
-
-                            }
-
-
-                            for (int i = 0; i < tempListShipment.size(); i++) {
+                                System.out.println("ShipmenActivity.onResponse - - -" + response.body().shipmentDetail.size());
+//                                Shipment shipment = new Shipment(response.body().shipmentDetail.get(i).getDeliveryDate(), response.body().shipmentDetail.get(i).orderid + "", response.body().shipmentDetail.get(i).statusid);
+//                                SimpleItem simpleItem = new SimpleItem(shipment);
+//                                fastAdapter.add(simpleItem);
 
                                 if (i == 0) {
-                                    fastAdapter.add(new SimpleItem(new Shipment(tempListShipment.get(i).getDeliveryDate(), tempListShipment.get(i).orderid + "", tempListShipment.get(i).statusid)));
+
+                                    fastAdapter.add(new SimpleItem(new Shipment(response.body().shipmentDetail.get(i).getDeliveryDate(), response.body().shipmentDetail.get(i).orderid + "", response.body().shipmentDetail.get(i).statusid, response.body().shipmentDetail.get(i).isFirst = true)));
                                 } else {
-                                    fastAdapter.add(new SimpleItem(new Shipment(tempListShipment.get(i).getDeliveryDate(), tempListShipment.get(i).orderid + "", tempListShipment.get(i).statusid)));
+                                    fastAdapter.add(new SimpleItem(new Shipment(response.body().shipmentDetail.get(i).getDeliveryDate(), response.body().shipmentDetail.get(i).orderid + "", response.body().shipmentDetail.get(i).statusid, response.body().shipmentDetail.get(i).isFirst = false)));
                                 }
-                            }*/
+
+                                Log.i(TAG, "onResponse: ");
+                            }
+//
+//
+//                            for (int i = 0; i < response.body().shipmentDetail.size(); i++) {
+//
+//                                if (response.body().shipmentDetail.get(i).getStatusid() != 3)  // not done check
+//                                {
+//                                    tempListShipment.add(response.body().shipmentDetail.get(i));
+//                                    continue;
+//                                }
+//
+//
+//                            }
+//
+//
+//                            for (int i = 0; i < tempListShipment.size(); i++) {
+//
+//                                if (i == 0) {
+//                                    fastAdapter.add(new SimpleItem(new Shipment(tempListShipment.get(i).getDeliveryDate(), tempListShipment.get(i).orderid + "", tempListShipment.get(i).statusid)));
+//                                } else {
+//                                    fastAdapter.add(new SimpleItem(new Shipment(tempListShipment.get(i).getDeliveryDate(), tempListShipment.get(i).orderid + "", tempListShipment.get(i).statusid)));
+//                                }
+//                            }
                         }
                     } else {
                         TastyToast.makeText(ShipmenActivity.this, response.body().message, TastyToast.LENGTH_LONG, TastyToast.WARNING).show();
@@ -227,26 +241,30 @@ public class ShipmenActivity extends AppCompatActivity implements GoogleApiClien
             @Override
             public void onClick(final View v, final int position, final FastAdapter<SimpleItem> fastAdapter1, final SimpleItem item) {
 
+                System.out.println("ShipmenActivity.onClick - - - OnCLickkkkk ");
+
                 itemChange = item;
                 pos = position;
                 orderId = item.getShipment().getShipMentNo();
                 switch (v.getId()) {
 
+
                     case R.id.upload_file:
+
 
 //                        Intent intent = new Intent(ShipmenActivity.this, UploadImageActivity.class);
 //                        startActivity(intent);
 //                        fastAdapter.remove(position); // Integer.parseInt(orderId)
                         //finish();
 
-                     /*   Intent intent = new Intent(ShipmenActivity.this, UploadImageActivity.class);
-                        // set the new task and clear flags
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        startActivity(intent);*/
+//                        Intent intent = new Intent(ShipmenActivity.this, UploadImageActivity.class);
+//                        // set the new task and clear flags
+//                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                        startActivity(intent);
 
                         break;
 
-                    case R.id.tv_Accept: {
+                    case R.id.tv_Accept:
 
 
 //                        if (!reachedStatus) {
@@ -297,6 +315,9 @@ public class ShipmenActivity extends AppCompatActivity implements GoogleApiClien
 //                            });
 //                        }
 //
+
+                        // SHahzeb testing
+
 //                        if (item.getShipment().getTextViewState().getTextLable().equalsIgnoreCase("ON THE WAY")) {
 //
 //
@@ -381,17 +402,20 @@ public class ShipmenActivity extends AppCompatActivity implements GoogleApiClien
 //
 //                        }
 //                        break;
-                    }
 
 
-                    case R.id.reject: {
+                        // Shahzeb test
 
 
+                    case R.id.reject:
+//
+//                        Toast.makeText(getApplicationContext() , "Testting.." , Toast.LENGTH_SHORT).show();
+//                        System.out.println("ShipmenActivity.onClick - -  rejecting...");
+//
 //                        if (SystemClock.elapsedRealtime() - lastClickTime < 1000) {
 //                            return;
 //                        }
 //                        lastClickTime = SystemClock.elapsedRealtime();
-//
 //
 //                        new LovelyStandardDialog(context, LovelyStandardDialog.ButtonLayout.VERTICAL)
 //                                .setTopColorRes(R.color.colorAccent)
@@ -414,23 +438,22 @@ public class ShipmenActivity extends AppCompatActivity implements GoogleApiClien
 //
 //                        break;
 
-                    }
+                    case R.id.information:
 
-                    case R.id.information: {
-
+                        System.out.println("ShipmenActivity.onClick = = = information ");
 
                         if (SystemClock.elapsedRealtime() - lastClickTime < 1000) {
                             return;
                         }
                         lastClickTime = SystemClock.elapsedRealtime();
 
-//                        flipProgress();
+                        flipProgress();
                         HttpModule.provideRepositoryService().getShipperReciverListAPI(orderId).enqueue(new Callback<ResponseShipmentInformation>() {
 
                             @Override
                             public void onResponse(Call<ResponseShipmentInformation> call, Response<ResponseShipmentInformation> response) {
 
-//                                fpd.dismiss();
+                                fpd.dismiss();
                                 if (response.body() != null && response.body().isSuccess) {
 
 
@@ -456,10 +479,7 @@ public class ShipmenActivity extends AppCompatActivity implements GoogleApiClien
                             }
                         });
                         break;
-                    }
                 }
-
-
             }
 
             @Nullable
@@ -479,29 +499,29 @@ public class ShipmenActivity extends AppCompatActivity implements GoogleApiClien
 
     }
 
-    private void rejectingOrder() {
-
-        HttpModule.provideRepositoryService().getOrderRejectedAPI(orderId).enqueue(new Callback<ResponseGetOrderRejected>() {
-            @Override
-            public void onResponse(Call<ResponseGetOrderRejected> call, Response<ResponseGetOrderRejected> response) {
-
-                if (response.body().isSuccess) {
-                    TastyToast.makeText(getApplicationContext(), response.body().getMessage(), TastyToast.LENGTH_SHORT, TastyToast.SUCCESS).show();
-                } else {
-
-                    TastyToast.makeText(getApplicationContext(), "Getting False Value", TastyToast.LENGTH_SHORT, TastyToast.SUCCESS).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ResponseGetOrderRejected> call, Throwable t) {
-
-                System.out.println("ShipmenActivity.onFailure - - " + t);
-
-            }
-        });
-
-    }
+//    private void rejectingOrder() {
+//
+//        HttpModule.provideRepositoryService().getOrderRejectedAPI(orderId).enqueue(new Callback<ResponseGetOrderRejected>() {
+//            @Override
+//            public void onResponse(Call<ResponseGetOrderRejected> call, Response<ResponseGetOrderRejected> response) {
+//
+//                if (response.body().isSuccess) {
+//                    TastyToast.makeText(getApplicationContext(), response.body().getMessage(), TastyToast.LENGTH_SHORT, TastyToast.SUCCESS).show();
+//                } else {
+//
+//                    TastyToast.makeText(getApplicationContext(), "Getting False Value", TastyToast.LENGTH_SHORT, TastyToast.SUCCESS).show();
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<ResponseGetOrderRejected> call, Throwable t) {
+//
+//                System.out.println("ShipmenActivity.onFailure - - " + t);
+//
+//            }
+//        });
+//
+//    }
 
     private void flipProgress() {
 
@@ -539,58 +559,58 @@ public class ShipmenActivity extends AppCompatActivity implements GoogleApiClien
     }
 
 
-    @Override
-    public void onConnected(@Nullable Bundle bundle) {
-        mLocationRequest = LocationRequest.create();
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        mLocationRequest.setInterval(1000); // Update location every second
-
-        try {
-            if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION)
-                    != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
-                    != PackageManager.PERMISSION_GRANTED) {
-                return;
-            }
-            mLocationCallback = new LocationCallback() {
-                @Override
-                public void onLocationResult(LocationResult locationResult) {
-
-                    if (locationResult != null) {
-
-
-                        sendDataToServer(locationResult, orderId, rEceiverId);
-
-
-                        Log.i(TAG, "onLocationResult: ");
-
-                        Location reciverLoc = new Location("reciverLocation");
-                        reciverLoc.setLatitude(Double.valueOf(receiverlatitude));
-                        reciverLoc.setLongitude(Double.valueOf(receiverLongitude));
-
-                        float distanceInMeters = reciverLoc.distanceTo(locationResult.getLastLocation());
-
-                        sendDataToServerReached(orderId, rEceiverId, locationResult);
-                        stopLocationUpdates();
-
-//                        if (distanceInMeters < 10) {
+//    @Override
+//    public void onConnected(@Nullable Bundle bundle) {
+//        mLocationRequest = LocationRequest.create();
+//        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+//        mLocationRequest.setInterval(1000); // Update location every second
 //
-//                            sendDataToServerReached(orderId, rEceiverId, locationResult);
-//                            stopLocationUpdates();
-//                        }
-                    }
-                }
-            };
-
-
-            LocationServices.getFusedLocationProviderClient(getApplicationContext()).requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper());
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                mGoogleApiClient);
-
-    }
+//        try {
+//            if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+//                    != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
+//                    != PackageManager.PERMISSION_GRANTED) {
+//                return;
+//            }
+//            mLocationCallback = new LocationCallback() {
+//                @Override
+//                public void onLocationResult(LocationResult locationResult) {
+//
+//                    if (locationResult != null) {
+//
+//
+//                        sendDataToServer(locationResult, orderId, rEceiverId);
+//
+//
+//                        Log.i(TAG, "onLocationResult: ");
+//
+//                        Location reciverLoc = new Location("reciverLocation");
+//                        reciverLoc.setLatitude(Double.valueOf(receiverlatitude));
+//                        reciverLoc.setLongitude(Double.valueOf(receiverLongitude));
+//
+//                        float distanceInMeters = reciverLoc.distanceTo(locationResult.getLastLocation());
+//
+//                        sendDataToServerReached(orderId, rEceiverId, locationResult);
+//                        stopLocationUpdates();
+//
+////                        if (distanceInMeters < 10) {
+////
+////                            sendDataToServerReached(orderId, rEceiverId, locationResult);
+////                            stopLocationUpdates();
+////                        }
+//                    }
+//                }
+//            };
+//
+//
+//            LocationServices.getFusedLocationProviderClient(getApplicationContext()).requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper());
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+//                mGoogleApiClient);
+//
+//    }
 
     private void sendDataToServer(LocationResult locationResult, String orderId, String rEceiverId) {
 
@@ -651,22 +671,22 @@ public class ShipmenActivity extends AppCompatActivity implements GoogleApiClien
     }
 
 
-    @Override
-    public void onConnectionSuspended(int i) {
+//    @Override
+//    public void onConnectionSuspended(int i) {
+//
+//    }
 
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
-    }
+//    @Override
+//    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+//
+//    }
 
 
-    synchronized void buildGoogleApiClient() {
-        mGoogleApiClient = new GoogleApiClient.Builder(getApplicationContext())
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build();
-    }
+//    synchronized void buildGoogleApiClient() {
+//        mGoogleApiClient = new GoogleApiClient.Builder(getApplicationContext())
+//                .addConnectionCallbacks(this)
+//                .addOnConnectionFailedListener(this)
+//                .addApi(LocationServices.API)
+//                .build();
+//    }
 }

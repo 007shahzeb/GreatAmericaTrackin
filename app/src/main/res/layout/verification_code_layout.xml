@@ -369,7 +369,7 @@
         app:layout_constraintTop_toBottomOf="@+id/textView3">
 
         <EditText
-
+            android:text="1"
             android:textCursorDrawable="@drawable/color_cursor"
             android:id="@+id/ed1"
             android:layout_width="@dimen/_35sdp"
@@ -378,12 +378,12 @@
             android:gravity="center"
             android:inputType="number"
             android:maxLength="1"
-            android:text="1"
             android:singleLine="true"
             android:textColor="@color/white"
             android:textColorHint="@color/white" />
 
         <EditText
+            android:text="2"
             android:textCursorDrawable="@drawable/color_cursor"
             android:id="@+id/ed2"
             android:layout_width="@dimen/_35sdp"
@@ -393,12 +393,12 @@
             android:gravity="center"
             android:inputType="number"
             android:maxLength="1"
-            android:text="2"
             android:singleLine="true"
             android:textColor="@color/white"
             android:textColorHint="@color/white" />
 
         <EditText
+            android:text="3"
             android:textCursorDrawable="@drawable/color_cursor"
             android:id="@+id/ed3"
             android:layout_width="@dimen/_35sdp"
@@ -408,12 +408,12 @@
             android:gravity="center"
             android:inputType="number"
             android:maxLength="1"
-            android:text="3"
             android:singleLine="true"
             android:textColor="@color/white"
             android:textColorHint="@color/white" />
 
         <EditText
+            android:text="4"
             android:textCursorDrawable="@drawable/color_cursor"
             android:id="@+id/ed4"
             android:layout_width="@dimen/_35sdp"
@@ -423,7 +423,6 @@
             android:gravity="center"
             android:inputType="number"
             android:maxLength="1"
-            android:text="4"
             android:singleLine="true"
             android:textColor="@color/white"
             android:textColorHint="@color/white" />
