@@ -53,6 +53,7 @@ public class ShipmentOrderAdapter extends RecyclerView.Adapter<ShipmentOrderAdap
             holder.pickup_date.setText(orderListInfos.get(position).pickupDate);
             holder.load_number.setText(orderListInfos.get(position).loadnumber);
             holder.shipper_note.setText(orderListInfos.get(position).shippernote);
+            holder.phone_number.setText(orderListInfos.get(position).phonenumber);
 
 //            RECEIVER INFO
 

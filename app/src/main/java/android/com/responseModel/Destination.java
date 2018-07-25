@@ -7,27 +7,29 @@ public class Destination {
 
     @SerializedName("id")
     @Expose
-    public Integer id;
+    private Integer id;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public String getLat() {
+        return lat;
+    }
+
+    public String getLng() {
+        return lng;
+    }
 
     @SerializedName("lat")
     @Expose
-    public String lat;
+    private String lat;
 
     @SerializedName("lng")
     @Expose
-    public String lng;
+    private String lng;
 
-//    public Integer getId() {
-//        return id;
-//    }
-//
-//    public String getLat() {
-//        return lat;
-//    }
-//
-//    public String getLng() {
-//        return lng;
-//    }
+
 
 
 }

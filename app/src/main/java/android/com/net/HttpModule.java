@@ -14,11 +14,11 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class HttpModule {
 
-
     private static OkHttpClient getOkkHttpClient() {
+
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(BuildConfig.DEBUG ? HttpLoggingInterceptor.Level.BODY : HttpLoggingInterceptor.Level.NONE);
-        return new OkHttpClient.Builder()/*.writeTimeout(5, TimeUnit.MINUTES)/*.addInterceptor(logging)*//*.addNetworkInterceptor(new StethoInterceptor())*/.readTimeout(180, TimeUnit.SECONDS).connectTimeout(180,TimeUnit.SECONDS).build();
+        return new OkHttpClient.Builder()/*.writeTimeout(5, TimeUnit.MINUTES)/*.addInterceptor(logging)*//*.addNetworkInterceptor(new StethoInterceptor())*/.readTimeout(180, TimeUnit.SECONDS).connectTimeout(180, TimeUnit.SECONDS).build();
 
     }
 
@@ -26,6 +26,7 @@ public class HttpModule {
     public static Retrofit getRetroFitClient() {
         return new Retrofit.Builder()
                 .baseUrl("http://34.234.186.44:4000/driverapp/")
+                // .baseUrl("http://18.217.234.39/EZE/public/api/addAttachmentImage")
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create()) // Shahzeb added this to use RxJava
                 .addConverterFactory(GsonConverterFactory.create(new GsonBuilder().setLenient().create()))
                 .client(getOkkHttpClient())

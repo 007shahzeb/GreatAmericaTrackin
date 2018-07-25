@@ -1,19 +1,22 @@
 package android.com.activity;
 
+import android.com.activity.MyCallBack.IresultCallback;
 import android.com.adapters.AdapterMade;
+import android.com.apiResponses.shipmentList.ShipmentList;
+import android.com.apiResponses.shipmentList.ShipmentListMain;
 import android.com.garytransportnew.R;
+import android.com.interfaces.ItemClickListener;
 import android.com.net.HttpModule;
-import android.com.test.ShipmentInformation;
-import android.com.test.ShipmentListTest;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 
 import com.sdsmdg.tastytoast.TastyToast;
-
 
 import java.util.ArrayList;
 
@@ -23,13 +26,15 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
 
-public class A extends AppCompatActivity {
+public class A extends AppCompatActivity implements IresultCallback { // ItemClickListener
 
 
     RecyclerView recylerId;
 
     private AdapterMade adapterMade;
-    ArrayList<ShipmentInformation> eventSuccessArrayList = new ArrayList<>();
+    ArrayList<ShipmentList> eventSuccessArrayList = new ArrayList<>();
+
+    private ItemClickListener itemClickListener;
 
     Context context;
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
@@ -42,10 +47,17 @@ public class A extends AppCompatActivity {
 
         context = this;
 
+        hidingActionBar();
         findingIdsHere();
         initializingAdpterHere();
 
 
+    }
+
+    private void hidingActionBar() {
+        // Hiding Action in a particular Activity
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.hide();
     }
 
     private void initializingAdpterHere() {
@@ -54,22 +66,29 @@ public class A extends AppCompatActivity {
         compositeDisposable.add(HttpModule.provideRepositoryService().getShipmentListTest(MainActivity.enteredMobileNumber)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<ShipmentListTest>() {
+                .subscribe(new Consumer<ShipmentListMain>() {
                     @Override
-                    public void accept(ShipmentListTest eventSuccess) throws Exception {
+                    public void accept(ShipmentListMain eventSuccess) throws Exception {
 
 
                         if (eventSuccess.isSuccess) {
 
                             System.out.println("A.accept");
 
-                            eventSuccessArrayList = new ArrayList<>(eventSuccess.informationList);
+                            eventSuccessArrayList = new ArrayList<>(eventSuccess.shipmentList);
 
 
                             TastyToast.makeText(getApplicationContext(), eventSuccess.message, TastyToast.LENGTH_SHORT, TastyToast.SUCCESS).show();
+                          adapterMade = new AdapterMade(A.this,eventSuccessArrayList);
 
-                            adapterMade = new AdapterMade(A.this, eventSuccessArrayList);
+
+
+
+
+
+
                             recylerId.setAdapter(adapterMade);
+
 
                         }
 
@@ -99,6 +118,16 @@ public class A extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+
+    }
+
+
+    @Override
+    public void getResult(AdapterMade.MadeViewHolder madeViewHolder, int position) {
+        Log.i("", "getResult: "+position);
+
+        madeViewHolder.itemView.getId();
+
 
     }
 }

@@ -54,4 +54,29 @@ public class ShipmentDetail {
     }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

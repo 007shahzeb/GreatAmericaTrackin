@@ -1,98 +1,120 @@
 package android.com.activity;
 // https://stackoverflow.com/questions/22874735/upload-large-file-with-progress-bar-and-without-outofmemory-error-in-android
 
-import android.com.CustomMultiPartEntity;
+import android.Manifest;
 import android.com.garytransportnew.R;
+import android.com.net.HttpModule;
+import android.com.responseModel.ResponseUploadDocumnets;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.github.ybq.android.spinkit.style.DoubleBounce;
 import com.mindorks.paracamera.Camera;
 import com.sdsmdg.tastytoast.TastyToast;
+import com.vistrav.ask.Ask;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.mime.content.FileBody;
-import org.apache.http.entity.mime.content.StringBody;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.util.EntityUtils;
-
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import dmax.dialog.SpotsDialog;
+import io.reactivex.disposables.CompositeDisposable;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class UploadImageActivity extends AppCompatActivity implements View.OnClickListener {
 
-    //, ProgressRequestBody.UploadCallbacks
+
+    // https://github.com/androidmads/Retrofit2MediaUpload/blob/master/app/src/main/java/com/androidmads/retrofit2mediaupload/MainActivity.java
 
     private ImageView image_SelectFromCamera;
     private TextView tv_SelectFromPhotos, tv_transport_docFile, tv_MBTextview;
+
     private static int RESULT_LOAD_IMAGE = 2;
-    //    ProgressBar mProgressBar;
     Handler handler = new Handler();
 
     private TextView showingProgressiveValue, imageUploadingButton, tv_Cancel;
     public Camera camera;
+
     public Uri selectedImage;
     public Bitmap bitmap;
+
     String filePath = "";
     int file_size, file_size_gallery;
 
-    //    int size;
-    private static long back_pressed;
     String filename_gallery;
 
 
     // New Implementations
 
     private final String filename = "path.substring(path.lastIndexOf(\"/\") + 1)";
-    // private final String filename = "/mnt/sdcard/a.3gp";
     private String urlString = "http://34.234.186.44:4000/driverapp/sendDocument";
+
     private TextView tv;
     long totalSize = 0;
+
     private long lastClickTime = 0;
     private Context mContext;
-    private SpotsDialog dialog = null;
 
+    private SpotsDialog dialog = null;
     private boolean isClickable = false;
 
-    TextView row_fileNameTV;
-    TextView row_fileSizeTV;
-    ImageView row_deleteImage;
-    ProgressBar row_progressbar;
-    LinearLayout linear_parent;
     LinearLayout parent_layout;
     ProgressBar mProgressBar;
+
     private TextView filepathName;
     private TextView filesizeName;
+
     private ImageView image;
 
+    String orderID;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.upload_image_layout_contraint);
+
+        if (getIntent() != null) {
+            if (getIntent().hasExtra("orderId")) {
+                orderID = getIntent().getStringExtra("orderId");
+            }
+        }
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.hide();
@@ -101,6 +123,15 @@ public class UploadImageActivity extends AppCompatActivity implements View.OnCli
         listener();
         buildingTheCamera();
         mContext = this;
+
+
+        Ask.on(this)
+                .id(5) // in case you are invoking multiple time Ask from same activity or fragment
+                .forPermissions(Manifest.permission.ACCESS_COARSE_LOCATION
+                        , Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                .withRationales("Location permission need for map to work properly",
+                        "In order to save file you will need to grant storage permission") //optional
+                .go();
 
     }
 
@@ -129,7 +160,6 @@ public class UploadImageActivity extends AppCompatActivity implements View.OnCli
     }
 
 
-    // Get the bitmap and image path onActivityResult of an activity or fragment
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -179,11 +209,8 @@ public class UploadImageActivity extends AppCompatActivity implements View.OnCli
 
             filepathName.setText(filename_gallery);
             filesizeName.setText(String.valueOf(file_size_gallery) + " KB");
-
-
             cursor.close();
 
-//            size = file_size_gallery;
         }
     }
 
@@ -231,7 +258,6 @@ public class UploadImageActivity extends AppCompatActivity implements View.OnCli
             case R.id.image_SelectFromCamera:
 
                 imageUploadingButton.setClickable(true);
-//                mProgressBar.getProgressDrawable().setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
                 if (imageUploadingButton.getText().toString().equalsIgnoreCase("UPLOADED"))
                     imageUploadingButton.setText("UPLOAD");
                 clickingPicturesFromCamera();
@@ -241,7 +267,6 @@ public class UploadImageActivity extends AppCompatActivity implements View.OnCli
             case R.id.tv_SelectFromPhotos:
 
                 imageUploadingButton.setClickable(true);
-//                mProgressBar.getProgressDrawable().setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
                 if (imageUploadingButton.getText().toString().equalsIgnoreCase("UPLOADED"))
                     imageUploadingButton.setText("UPLOAD");
                 buildingTheGallery();
@@ -250,25 +275,49 @@ public class UploadImageActivity extends AppCompatActivity implements View.OnCli
 
             case R.id.imageUploadingButton:
 
+
+                if (Build.VERSION.SDK_INT >= 23) {
+
+                    if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                            == PackageManager.PERMISSION_GRANTED) {
+                        Log.v("", "Permission is granted");
+                    } else {
+
+                        Log.v("", "Permission is revoked");
+                        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+                    }
+                } else { //permission is automatically granted on sdk<23 upon installation
+                    Log.v("", "Permission is granted");
+                }
+
+
                 if (dialog == null) {
                     dialog = new SpotsDialog(mContext);
                     dialog.setCancelable(false);
                     dialog.show();
 
+
                 } else dialog.show();
 
-                if (imageUploadingButton.getText().toString().equalsIgnoreCase("UPLOAD"))
+
+                if (imageUploadingButton.getText().toString().equalsIgnoreCase("UPLOAD")) {
                     imageUploadingButton.setText("UPLOADING...");
 
-//                addindLayout();
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                newWay();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }).start();
+                }
 
-
-                uploadingDocumentsAPICalling(v);
                 break;
 
-
             case R.id.tv_Cancel:
-//
                 Intent intent = new Intent(Intent.ACTION_MAIN);
                 intent.addCategory(Intent.CATEGORY_HOME);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -280,96 +329,53 @@ public class UploadImageActivity extends AppCompatActivity implements View.OnCli
         }
     }
 
-    private void addindLayout() {
-        View child = getLayoutInflater().inflate(R.layout.progressbar_row, null);
-        linear_parent.addView(child);
+    private void newWay() {
 
+
+        File file = new File(filePath);
+
+        RequestBody oId = RequestBody.create(MediaType.parse("text/plain"), orderID);
+        //RequestBody rq6 = RequestBody.create(MediaType.parse("image/*"), file.getName());
+        MultipartBody.Part filePart = MultipartBody.Part.createFormData("myDocs", file.getName(), RequestBody.create(MediaType.parse("image/*"), file));
+//        MultipartBody.Part filePart = MultipartBody.Part.createFormData(orderID,)
+
+        HttpModule.provideRepositoryService().UpdateImageDocs(filePart, oId).enqueue(new Callback<ResponseUploadDocumnets>() {
+            @Override
+            public void onResponse(Call<ResponseUploadDocumnets> call, Response<ResponseUploadDocumnets> response) {
+
+                if (response.toString() != null) {
+
+                    if (response.body().getSuccess()) {
+
+                        isClickable = true;
+                        imageUploadingButton.setClickable(isClickable);
+                        mProgressBar.getProgressDrawable().setColorFilter(Color.GREEN, PorterDuff.Mode.SRC_IN);
+                        dialog.dismiss();
+                        if (imageUploadingButton.getText().toString().equalsIgnoreCase("UPLOADING..."))
+                            imageUploadingButton.setText("UPLOADED");
+                        imageUploadingButton.setClickable(false);
+
+                        TastyToast.makeText(getApplicationContext(), response.body().getMessage(), TastyToast.LENGTH_SHORT, TastyToast.SUCCESS).show();
+
+                    } else {
+
+                        TastyToast.makeText(getApplicationContext(), response.body().getMessage(), TastyToast.LENGTH_SHORT, TastyToast.SUCCESS).show();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseUploadDocumnets> call, Throwable t) {
+                System.out.println("UploadImageActivity.onFailure - - " + t);
+            }
+        });
     }
 
-    private void uploadingDocumentsAPICalling(View v) {
-        new Uploadtask().execute();
-    }
 
-    // The bitmap is saved in the app's folder
-//  If the saved bitmap is not required use following code
     @Override
     protected void onDestroy() {
         super.onDestroy();
         camera.deleteImage();
-    }
-
-
-    private class Uploadtask extends AsyncTask<Void, Integer, String> {
-        @Override
-        protected void onPreExecute() {
-            mProgressBar.setProgress(0);
-            super.onPreExecute();
-        }
-
-        @Override
-        protected void onProgressUpdate(Integer... progress) {
-            mProgressBar.setProgress(progress[0]);
-        }
-
-        @Override
-        protected String doInBackground(Void... params) {
-            return upload();
-        }
-
-        private String upload() {
-            String responseString = "no";
-            File sourceFile = new File(filePath);
-            if (!sourceFile.isFile()) {
-                return "not a file";
-            }
-            HttpClient httpclient = new DefaultHttpClient();
-            HttpPost httppost = new HttpPost(urlString);
-
-
-            try {
-                CustomMultiPartEntity entity = new CustomMultiPartEntity(new CustomMultiPartEntity.ProgressListener() {
-                    @Override
-                    public void transferred(long num) {
-
-                        publishProgress((int) ((num / (float) totalSize) * 100));
-
-                    }
-                });
-
-                entity.addPart("type", new StringBody("image"));
-                entity.addPart("uploadedfile", new FileBody(sourceFile));
-                totalSize = entity.getContentLength();
-                httppost.setEntity(entity);
-                HttpResponse response = httpclient.execute(httppost);
-                HttpEntity r_entity = response.getEntity();
-                responseString = EntityUtils.toString(r_entity);
-
-            } catch (ClientProtocolException e) {
-                responseString = e.toString();
-            } catch (IOException e) {
-                responseString = e.toString();
-            }
-
-            return responseString;
-
-        }
-
-
-        @Override
-        protected void onPostExecute(String result) {
-            isClickable = true;
-            imageUploadingButton.setClickable(isClickable);
-            mProgressBar.getProgressDrawable().setColorFilter(Color.GREEN, PorterDuff.Mode.SRC_IN);
-            dialog.dismiss();
-            if (imageUploadingButton.getText().toString().equalsIgnoreCase("UPLOADING..."))
-                imageUploadingButton.setText("UPLOADED");
-            imageUploadingButton.setClickable(false);
-
-            TastyToast.makeText(getApplicationContext(), "Document Uploaded Successfully", TastyToast.LENGTH_SHORT, TastyToast.SUCCESS).show();
-            super.onPostExecute(result);
-
-        }
-
     }
 
 

@@ -7,6 +7,7 @@ import android.com.InternetConnection;
 import android.com.garytransportnew.R;
 import android.com.net.HttpModule;
 import android.com.responseModel.ResponseDriverNumber;
+import android.com.sharedPrefrence.PreferencesManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -29,6 +30,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.hbb20.CountryCodePicker;
+import com.kaopiz.kprogresshud.KProgressHUD;
 import com.sdsmdg.tastytoast.TastyToast;
 import com.taishi.flipprogressdialog.FlipProgressDialog;
 
@@ -50,8 +52,14 @@ public class MainActivity extends AppCompatActivity
     public static String enteredMobileNumber;
     private long lastClickTime = 0;
     private static long back_pressed;
+
     FlipProgressDialog fpd;
+    KProgressHUD hud;
+
     Context context;
+
+
+    PreferencesManager preferencesManager;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -66,6 +74,8 @@ public class MainActivity extends AppCompatActivity
         actionBar.hide();
 
         context = this;
+        hud = new KProgressHUD(this);
+        preferencesManager = new PreferencesManager(context);
 
         int permissionCheck = ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION);
         if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
@@ -105,6 +115,9 @@ public class MainActivity extends AppCompatActivity
         if (edMobileNo.getText().toString().isEmpty() || edMobileNo.getText().toString().length() != 10) {
             edMobileNo.setError("Please Enter The 10 digit Mobile Number");
 
+
+
+
             networkConnection();
 
 
@@ -113,13 +126,15 @@ public class MainActivity extends AppCompatActivity
             // Retrofit code
             networkConnection();
             flipProgress();
+//            pleaseWaitDialog();
+
+
             HttpModule.provideRepositoryService().getDriverNumberAPI(edMobileNo.getText().toString()).enqueue(new Callback<ResponseDriverNumber>() {
                 @Override
                 public void onResponse(Call<ResponseDriverNumber> call, Response<ResponseDriverNumber> response) {
-
+//                    hud.dismiss();
                     fpd.dismiss();
                     if (response.body() != null && response.body().isSuccess) {
-
 
                         if (SystemClock.elapsedRealtime() - lastClickTime < 1000) {
                             return;
@@ -127,12 +142,16 @@ public class MainActivity extends AppCompatActivity
                         lastClickTime = SystemClock.elapsedRealtime();
 
                         enteredMobileNumber = edMobileNo.getText().toString();
+                        savingValuesInSharedPreference(enteredMobileNumber);
+//                        PreferencesManager.setLogin(true , context);
 
                         Intent intent = new Intent(MainActivity.this, VeryficationCodeActivity.class);
+                        intent.putExtra("drivernumber", enteredMobileNumber);
                         startActivity(intent);
-
+                        finish();
 
                     } else {
+
                         TastyToast.makeText(MainActivity.this, response.body().message, TastyToast.LENGTH_LONG, TastyToast.WARNING).show();
                     }
                 }
@@ -141,10 +160,32 @@ public class MainActivity extends AppCompatActivity
                 public void onFailure(Call<ResponseDriverNumber> call, Throwable t) {
                     System.out.println("MainActivity.onFailure - - " + t);
                     fpd.dismiss();
+//                    hud.dismiss();
+//                    kProgressHUD.dismiss();
                 }
             });
 
         }
+
+    }
+
+    private void savingValuesInSharedPreference(String enteredMobileNumber) {
+
+//        PreferencesManager.setLoginDetails("Driverno", enteredMobileNumber, context);
+
+    }
+
+
+    private void pleaseWaitDialog() {
+
+
+        hud = KProgressHUD.create(MainActivity.this)
+                .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
+                .setLabel("Please wait")
+                .setCancellable(false)
+                .setAnimationSpeed(2)
+                .setDimAmount(0.5f)
+                .show();
 
     }
 
@@ -214,7 +255,6 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-
     @Override
     public void onBackPressed() {
 
@@ -250,6 +290,9 @@ public class MainActivity extends AppCompatActivity
         }
 
     }
+
 }
+
+
 
 

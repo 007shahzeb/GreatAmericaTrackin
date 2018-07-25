@@ -7,95 +7,86 @@ import java.util.List;
 public class Shipment {
 
 
+    public Shipment(String deliveryDate, String shipMentNo, Integer statusId, boolean isFirst, Integer rcrecieverId, String rclat, String rclang) {
+        this.deliveryDate = deliveryDate;
+        this.shipMentNo = shipMentNo;
+        this.statusId = statusId;
+        this.isFirst = isFirst;
+        RcrecieverId = rcrecieverId;
+        Rclat = rclat;
+        Rclang = rclang;
+    }
+
     private String deliveryDate;
     private String shipMentNo;
     private Integer statusId;
-    private TextViewState upcoming;
-    public boolean isFirst = false;
+    private boolean isFirst;
 
-    public String getOrderId() {
-        return orderId;
+
+    private Integer RcrecieverId;
+    private String Rclat;
+
+    private String Rclang;
+
+    public Integer getRcrecieverId() {
+        return RcrecieverId;
     }
 
-    public void setOrderId(String orderId) {
-        this.orderId = orderId;
+
+
+    public String getRclat() {
+        return Rclat;
     }
 
-    public Integer getReciverId() {
-        return reciverId;
+
+
+    public String getRclang() {
+        return Rclang;
     }
 
-    public void setReciverId(Integer reciverId) {
-        this.reciverId = reciverId;
+    public void setRclang(String rclang) {
+        Rclang = rclang;
     }
 
-    public String getRcLat() {
-        return rcLat;
-    }
-
-    public void setRcLat(String rcLat) {
-        this.rcLat = rcLat;
-    }
-
-    public String getRcLang() {
-        return rcLang;
-    }
-
-    public void setRcLang(String rcLang) {
-        this.rcLang = rcLang;
-    }
-
-    private String orderId ="0";
-    private Integer reciverId = 0;
-    private String rcLat ="0";
-    private String rcLang = "0";
-
-
-
-
-
-
-
-    public Integer getStatusId() {
-        return statusId;
-    }
 
     public void setStatusId(Integer statusId) {
         this.statusId = statusId;
     }
 
 
-    public Shipment(String date, String shipMentNo, Integer statusId, boolean isFirst) {
-        this.deliveryDate = date;
-        this.shipMentNo = shipMentNo;
-        this.upcoming = upcoming;
-        this.statusId = statusId;
-        this.isFirst = isFirst;
-    }
-
-    public TextViewState getTextViewState() {
-        return upcoming;
-    }
-
-    public void setTextViewState(TextViewState textViewState) {
-        this.upcoming = textViewState;
-    }
 
 
-    public String getDate() {
+
+
+    public String getDeliveryDate() {
         return deliveryDate;
-    }
-
-    public void setDate(String date) {
-        this.deliveryDate = date;
     }
 
     public String getShipMentNo() {
         return shipMentNo;
     }
 
-    public void setShipMentNo(String shipMentNo) {
-        this.shipMentNo = shipMentNo;
+    public Integer getStatusId() {
+        return statusId;
     }
+
+
+
+    public boolean isFirst() {
+        return isFirst;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 }

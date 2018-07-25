@@ -5,11 +5,8 @@ package android.com.activity;
 import android.com.adapters.ShipmentOrderAdapter;
 import android.com.garytransportnew.R;
 import android.com.interfaces.CustomItemClickListener;
-import android.com.models.ShipmentOrderListInfo;
 import android.com.responseModel.ReceiverList;
-import android.com.responseModel.ResponseShipmentInformation;
 import android.com.responseModel.ShipperList;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
@@ -20,9 +17,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.Toast;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ShipmentOrderListInformation extends AppCompatActivity {

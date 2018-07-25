@@ -317,7 +317,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="44dp"
-        android:text="Veryfication Code"
+        android:text="Verification Code"
         android:textColor="@color/white"
         android:textSize="@dimen/_20sdp"
         android:textStyle="bold"
@@ -332,7 +332,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="96dp"
-        android:text="Please enter the veryfication code sent to"
+        android:text="Please enter the verification code sent to"
         android:textColor="#ffffff"
         android:textSize="@dimen/_11sdp"
         app:layout_constraintEnd_toStartOf="@+id/textView2"
@@ -347,7 +347,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="96dp"
-        android:text="91 8860984985"
+        android:text=""
         android:textColor="@color/white"
         android:textSize="@dimen/_11sdp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -369,8 +369,6 @@
         app:layout_constraintTop_toBottomOf="@+id/textView3">
 
         <EditText
-            android:text="1"
-            android:textCursorDrawable="@drawable/color_cursor"
             android:id="@+id/ed1"
             android:layout_width="@dimen/_35sdp"
             android:layout_height="@dimen/_50sdp"
@@ -380,11 +378,10 @@
             android:maxLength="1"
             android:singleLine="true"
             android:textColor="@color/white"
-            android:textColorHint="@color/white" />
+            android:textColorHint="@color/white"
+            android:textCursorDrawable="@drawable/color_cursor" />
 
         <EditText
-            android:text="2"
-            android:textCursorDrawable="@drawable/color_cursor"
             android:id="@+id/ed2"
             android:layout_width="@dimen/_35sdp"
             android:layout_height="@dimen/_50sdp"
@@ -395,11 +392,10 @@
             android:maxLength="1"
             android:singleLine="true"
             android:textColor="@color/white"
-            android:textColorHint="@color/white" />
+            android:textColorHint="@color/white"
+            android:textCursorDrawable="@drawable/color_cursor" />
 
         <EditText
-            android:text="3"
-            android:textCursorDrawable="@drawable/color_cursor"
             android:id="@+id/ed3"
             android:layout_width="@dimen/_35sdp"
             android:layout_height="@dimen/_50sdp"
@@ -410,11 +406,10 @@
             android:maxLength="1"
             android:singleLine="true"
             android:textColor="@color/white"
-            android:textColorHint="@color/white" />
+            android:textColorHint="@color/white"
+            android:textCursorDrawable="@drawable/color_cursor" />
 
         <EditText
-            android:text="4"
-            android:textCursorDrawable="@drawable/color_cursor"
             android:id="@+id/ed4"
             android:layout_width="@dimen/_35sdp"
             android:layout_height="@dimen/_50sdp"
@@ -425,7 +420,8 @@
             android:maxLength="1"
             android:singleLine="true"
             android:textColor="@color/white"
-            android:textColorHint="@color/white" />
+            android:textColorHint="@color/white"
+            android:textCursorDrawable="@drawable/color_cursor" />
 
     </LinearLayout>
 

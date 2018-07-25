@@ -27,6 +27,7 @@ import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.kaopiz.kprogresshud.KProgressHUD;
 import com.sdsmdg.tastytoast.TastyToast;
 import com.taishi.flipprogressdialog.FlipProgressDialog;
 
@@ -50,6 +51,7 @@ public class VeryficationCodeActivity extends AppCompatActivity {
     int userId;
     private long lastClickTime = 0;
     FlipProgressDialog fpd;
+    KProgressHUD hud;
 
     Context context;
 
@@ -68,14 +70,17 @@ public class VeryficationCodeActivity extends AppCompatActivity {
 
 
         if (getIntent() != null) {
-            if (getIntent().hasExtra("number")) {
-//                tvphn.setText(getIntent().getStringExtra("number"));
+            if (getIntent().hasExtra("drivernumber")) {
+                tv_OtpCode = findViewById(R.id.tv_OtpCode);
+                tv_OtpCode.setText(getIntent().getStringExtra("drivernumber"));
             }
             if (getIntent().hasExtra("id")) {
                 userId = (Integer) getIntent().getIntExtra("id", 0);
             }
 
         }
+
+        hud = new KProgressHUD(this);
 
         findingIdsHere();
 
@@ -95,7 +100,7 @@ public class VeryficationCodeActivity extends AppCompatActivity {
 
     private void findingIdsHere() {
 
-        tv_OtpCode = findViewById(R.id.tv_OtpCode);
+
 
         rlone = findViewById(R.id.rlone);
         rltwo = findViewById(R.id.rltwo);
@@ -117,6 +122,7 @@ public class VeryficationCodeActivity extends AppCompatActivity {
         mEd4 = findViewById(R.id.ed4);
 
     }
+
 
     public void Keybutton(View view) {
 
@@ -641,15 +647,19 @@ public class VeryficationCodeActivity extends AppCompatActivity {
 //                     Retrofit code
                     networkConnection();
                     flipProgress();
+//                    pleaseWaitDialog();
+
 
                     HttpModule.provideRepositoryService().getOtpNumberAPI(mEd1.getText().toString() + mEd2.getText().toString() + mEd3.getText().toString() + mEd4.getText().toString()).enqueue(new Callback<ResponseOtpNumber>() {
                         @Override
                         public void onResponse(Call<ResponseOtpNumber> call, Response<ResponseOtpNumber> response) {
                             fpd.dismiss();
+//                            hud.dismiss();
                             if (response.body() != null) {
 
                                 if (response.body().isSuccess) {
                                     fpd.dismiss();
+//                                    hud.dismiss();
                                     if (SystemClock.elapsedRealtime() - lastClickTime < 1000) {
                                         return;
                                     }
@@ -671,6 +681,7 @@ public class VeryficationCodeActivity extends AppCompatActivity {
                             System.out.println("VeryficationCodeActivity.onFailure - - " + t);
                             t.printStackTrace();
                             fpd.dismiss();
+//                            hud.dismiss();
                         }
                     });
 
@@ -709,6 +720,21 @@ public class VeryficationCodeActivity extends AppCompatActivity {
 //        }
 
     }
+
+
+    private void pleaseWaitDialog() {
+
+
+        hud = KProgressHUD.create(VeryficationCodeActivity.this)
+                .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
+                .setLabel("Please wait")
+                .setCancellable(false)
+                .setAnimationSpeed(2)
+                .setDimAmount(0.5f)
+                .show();
+
+    }
+
 
     private void flipProgress() {
 

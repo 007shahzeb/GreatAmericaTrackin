@@ -32,13 +32,4 @@ public class TextViewState {
         this.textLable = textLable;
     }
 
-
-
-
-  /*  int upcomingColor = ContextCompat.getColor(context, R.color.upcomingColorCode);
-    int acceptColor = ContextCompat.getColor(context, R.color.acceptColorCode);
-    int onthewayColor = ContextCompat.getColor(context, R.color.onthewatColorCode);
-    int reachedColor = ContextCompat.getColor(context, R.color.reachedColorCode);*/
-
-
 }

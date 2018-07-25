@@ -19,7 +19,13 @@
     <color name="acceptColorCode">#FF2CD773</color>
     <color name="onthewatColorCode">#FF02BCFB</color>
     <color name="reachedColorCode">#FFFFC93D</color>
+    <color name="dialogcolorcode">#ffffff</color>
+
+
 
     <color name="blue">#354ad2</color>
+    <color name="BurntSienna">#8A3324</color>
+
+    E97451
 
 </resources>

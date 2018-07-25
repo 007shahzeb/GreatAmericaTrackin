@@ -17,4 +17,12 @@ public class ResponseRealTimeLocationCheckedStatus {
     @Expose
     public Integer status;
 
+
+
+
+
+
+
+
+
 }

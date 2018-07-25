@@ -8,6 +8,23 @@ public class ResponseUploadDocumnets {
     @SerializedName("isSuccess")
     @Expose
     public Boolean isSuccess;
+
+    public Boolean getSuccess() {
+        return isSuccess;
+    }
+
+    public void setSuccess(Boolean success) {
+        isSuccess = success;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
     @SerializedName("message")
     @Expose
     public String message;

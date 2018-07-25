@@ -19,4 +19,8 @@ public class ResponseShipmentList {
     @Expose
     public List<ShipmentDetail> shipmentDetail = null;
 
+
+
+
+
 }

@@ -4,58 +4,62 @@ package android.com.responseModel;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 public class ShipmentDetail {
-
-    @SerializedName("orderid")
-    @Expose
-    public Integer orderid;
-
-    @SerializedName("statusid")
-    @Expose
-    public Integer statusid;
-
-    @SerializedName("delivery_date")
-    @Expose
-    public String deliveryDate;
-
-    public boolean isFirst = false;
-
-    public boolean isFirst() {
-        return isFirst;
-    }
-
-    public void setFirst(boolean first) {
-        isFirst = first;
-    }
-
 
     public Integer getOrderid() {
         return orderid;
-    }
-
-    public void setOrderid(Integer orderid) {
-        this.orderid = orderid;
     }
 
     public Integer getStatusid() {
         return statusid;
     }
 
-    public void setStatusid(Integer statusid) {
-        this.statusid = statusid;
-    }
-
     public String getDeliveryDate() {
         return deliveryDate;
     }
 
-    public void setDeliveryDate(String deliveryDate) {
-        this.deliveryDate = deliveryDate;
+    @SerializedName("orderid")
+    @Expose
+    private Integer orderid;
+
+    @SerializedName("statusid")
+    @Expose
+    private Integer statusid;
+
+    @SerializedName("delivery_date")
+    @Expose
+    private String deliveryDate;
+
+
+    public Integer getRcrecieverId() {
+        return RcrecieverId;
     }
+
+    public String getRclat() {
+        return Rclat;
+    }
+
+    public String getRclang() {
+        return Rclang;
+    }
+
+    @SerializedName("ReceiverId")
+    @Expose
+    private Integer RcrecieverId;
+
+    @SerializedName("DestinationLat")
+    @Expose
+    private String Rclat;
+
+    @SerializedName("DestinationLng")
+    @Expose
+    private String Rclang;
+
+
+
+
+
+
 
 
 }

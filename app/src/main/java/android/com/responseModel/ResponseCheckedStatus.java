@@ -7,51 +7,36 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-public class  ResponseCheckedStatus {
-    Context context;
-
-    public ResponseCheckedStatus(Context context) {
-
-        this.context = context;
-    }
-
-//    @SerializedName("isSuccess")
-//    @Expose
-//
-//    public Boolean isSuccess;
-//
-//    @SerializedName("message")
-//    @Expose
-//    public String message;
-
-
-//    @SerializedName("isSuccess")
-//    @Expose
-//    public Boolean isSuccess;
-//    @SerializedName("message")
-//    @Expose
-//    public String message;
-//
-//    @SerializedName("Status")
-//    @Expose
-//    public String status;
+public class ResponseCheckedStatus {
 
 
     @SerializedName("isSuccess")
     @Expose
-    public Boolean isSuccess;
+    private Boolean isSuccess;
 
     @SerializedName("message")
     @Expose
-    public String message;
+    private String message;
+
 
     @SerializedName("Status")
     @Expose
-    public Integer status;
+    private Integer status;
 
-    @SerializedName("Destination")
-    @Expose
-    public Destination destination = null;
+    public Boolean getSuccess() {
+        return isSuccess;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+
+
 
 
 }
