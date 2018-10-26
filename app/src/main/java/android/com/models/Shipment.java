@@ -1,11 +1,24 @@
 package android.com.models;
 
-import android.com.responseModel.ResponseShipmentList;
-
-import java.util.List;
 
 public class Shipment {
 
+
+    private String deliveryDate;
+    private String shipMentNo;
+    private Integer statusId;
+    private boolean isFirst;
+    private String address;
+    private String time;
+
+    public String getTime() {
+        return time;
+    }
+
+
+    private Integer RcrecieverId;
+    private String Rclat;
+    private String Rclang;
 
     public Shipment(String deliveryDate, String shipMentNo, Integer statusId, boolean isFirst, Integer rcrecieverId, String rclat, String rclang) {
         this.deliveryDate = deliveryDate;
@@ -17,21 +30,15 @@ public class Shipment {
         Rclang = rclang;
     }
 
-    private String deliveryDate;
-    private String shipMentNo;
-    private Integer statusId;
-    private boolean isFirst;
 
+    public String getAddress() {
+        return address;
+    }
 
-    private Integer RcrecieverId;
-    private String Rclat;
-
-    private String Rclang;
 
     public Integer getRcrecieverId() {
         return RcrecieverId;
     }
-
 
 
     public String getRclat() {
@@ -39,23 +46,14 @@ public class Shipment {
     }
 
 
-
     public String getRclang() {
         return Rclang;
-    }
-
-    public void setRclang(String rclang) {
-        Rclang = rclang;
     }
 
 
     public void setStatusId(Integer statusId) {
         this.statusId = statusId;
     }
-
-
-
-
 
 
     public String getDeliveryDate() {
@@ -71,22 +69,9 @@ public class Shipment {
     }
 
 
-
     public boolean isFirst() {
         return isFirst;
     }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 }

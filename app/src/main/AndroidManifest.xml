@@ -38,7 +38,15 @@
         <activity
             android:name="android.com.activity.ShipmenActivity"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateAlwaysHidden|adjustResize" />
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize">
+
+            <!--<intent-filter>-->
+            <!--<action android:name="android.intent.action.MAIN" />-->
+
+            <!--<category android:name="android.intent.category.LAUNCHER" />-->
+            <!--</intent-filter>-->
+
+        </activity>
 
         <activity
             android:name="android.com.activity.UploadImageActivity"
@@ -87,6 +95,18 @@
             <!--<category android:name="android.intent.category.LAUNCHER" />-->
             <!--</intent-filter>-->
         </activity>
+
+
+        <receiver android:name="android.com.receivers.NetworkChangeReceiver">
+            <intent-filter>
+                <action android:name="android.net.conn.Con" />
+            </intent-filter>
+        </receiver>
+
+
+        <service
+            android:name="android.com.service.LocationService"
+            android:enabled="true" />
 
 
     </application>

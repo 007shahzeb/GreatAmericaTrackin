@@ -8,6 +8,7 @@
     android:gravity="center">
 
     <com.hbb20.CountryCodePicker
+
         android:id="@+id/ccp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -21,31 +22,31 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.599"
         app:textSize="@dimen/_12sdp" />
+    <!--app:defaultCode="@integer/defaul_country_code"-->
 
     <EditText
-    android:textCursorDrawable="@drawable/color_cursor"
-    android:textColor="@color/white"
-    android:id="@+id/edMobileNo"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginBottom="8dp"
-    android:layout_marginStart="8dp"
-    android:layout_marginTop="8dp"
-    android:backgroundTint="@color/edittextlinecolor"
-    android:ems="10"
-    android:hint="Enter Mobile Number"
-    android:inputType="number"
-    android:textColorHint="#ffffff"
-    android:textSize="@dimen/_12sdp"
-    android:maxLength="10"
-    app:layout_constraintBottom_toBottomOf="parent"
-    app:layout_constraintStart_toEndOf="@+id/ccp"
-    app:layout_constraintTop_toTopOf="parent"
-    app:layout_constraintVertical_bias="0.598"
-    android:layout_marginLeft="8dp" />
+        android:id="@+id/edMobileNo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:backgroundTint="@color/edittextlinecolor"
+        android:ems="10"
+        android:hint="Enter Mobile Number"
+        android:inputType="number"
+        android:maxLength="10"
+        android:textColor="@color/white"
+        android:textColorHint="#ffffff"
+        android:textCursorDrawable="@drawable/color_cursor"
+        android:textSize="@dimen/_12sdp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/ccp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.598" />
 
     <com.alimuzaffar.lib.widgets.AnimatedEditText
-        android:visibility="gone"
         android:id="@+id/edMobileNotest"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -62,6 +63,7 @@
         android:textColorHint="#ffffff"
         android:textCursorDrawable="@drawable/color_cursor"
         android:textSize="@dimen/_12sdp"
+        android:visibility="gone"
         app:animateCursor="true"
         app:animateTextClear="true"
         app:animationType="fromRight"

@@ -55,13 +55,13 @@
     <TextView
         android:id="@+id/tv_Cancel"
         android:layout_width="0dp"
-        android:layout_height="36dp"
+        android:layout_height="40dp"
         android:background="@drawable/rounded_button_cancel"
         android:gravity="center"
-        android:text="CANCEL"
+        android:text="LOGOUT"
         android:textColor="#ffffff"
         android:textStyle="bold"
-        android:visibility="visible"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/imageUploadingButton"
         app:layout_constraintStart_toStartOf="parent" />
@@ -69,17 +69,26 @@
 
     <TextView
         android:id="@+id/imageUploadingButton"
-        android:layout_width="0dp"
-        android:layout_height="36dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginStart="16dp"
         android:background="@drawable/rounded_button_uploading"
         android:gravity="center"
+        android:padding="@dimen/_10sdp"
         android:text="UPLOAD"
         android:textColor="#ffffff"
         android:textStyle="bold"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/tv_Cancel" />
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/recylerView"
+        app:layout_constraintVertical_bias="1.0" />
 
 
     <View
@@ -146,18 +155,37 @@
     </android.support.constraint.ConstraintLayout>
 
 
-    <LinearLayout
-        android:id="@+id/linear_parent"
+    <!--<LinearLayout-->
+    <!--android:id="@+id/linear_parent"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_marginEnd="8dp"-->
+    <!--android:layout_marginLeft="8dp"-->
+    <!--android:layout_marginRight="8dp"-->
+    <!--android:layout_marginStart="8dp"-->
+    <!--android:layout_marginTop="8dp"-->
+    <!--android:orientation="vertical"-->
+    <!--app:layout_constraintEnd_toEndOf="parent"-->
+    <!--app:layout_constraintStart_toStartOf="parent"-->
+    <!--app:layout_constraintTop_toBottomOf="@+id/progressBar1" />-->
+
+
+    <android.support.v7.widget.RecyclerView
+
+
+        android:id="@+id/recylerView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_marginEnd="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:orientation="vertical"
+        android:scrollbars="vertical"
+        app:layout_constraintBottom_toTopOf="@+id/imageUploadingButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/progressBar1" />
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
+
 
 </android.support.constraint.ConstraintLayout>

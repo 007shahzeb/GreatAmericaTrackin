@@ -1,6 +1,7 @@
 package android.com.net;
 
 import android.com.apiResponses.shipmentList.ShipmentListMain;
+import android.com.models.OfflineDataModel;
 import android.com.responseModel.ResponseCheckedStatus;
 import android.com.responseModel.ResponseDriverNumber;
 import android.com.responseModel.ResponseOtpNumber;
@@ -10,12 +11,19 @@ import android.com.responseModel.ResponseGetOrderRejected;
 import android.com.responseModel.ResponseShipmentInformation;
 import android.com.responseModel.ResponseShipmentList;
 import android.com.responseModel.ResponseUploadDocumnets;
+import android.com.responseModel.logout.Logout;
+import android.com.responseModel.nearByCheckAPI.NearByCheck;
+import android.com.responseModel.sessionMaintain.Session;
+
+import java.util.List;
 
 import io.reactivex.Observable;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.http.Body;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.Multipart;
@@ -34,7 +42,8 @@ public interface RemoteRepositoryService {
     // Second Api- Validate OTP
     @FormUrlEncoded
     @POST("validateOTP/")
-    Call<ResponseOtpNumber> getOtpNumberAPI(@Field("otp") String user);
+    Call<ResponseOtpNumber> getOtpNumberAPI(@Field("otp") String user,
+                                            @Field("driverno") String driverno);
 
 
     // Third Api- Shipment List
@@ -75,17 +84,19 @@ public interface RemoteRepositoryService {
 
 
     // passing driver lat long , or we can say current lat lang // main order tracking
+
     @FormUrlEncoded
     @POST("orderTracking/")
     Call<ResponseBody> getRealTimeLocationAPI(@Field("orderid") String orderId,
                                               @Field("lat") String lat,
-                                              @Field("lng") String lng);
+                                              @Field("lng") String lng,
+                                              @Field("address") String address,
+                                              @Field("time") String time);
 
 
     // Making the multipart request , its also available for Video , Audio..
 
     // Shahzeb commented this
-
 
 
 //    @Multipart
@@ -95,9 +106,7 @@ public interface RemoteRepositoryService {
 
     @Multipart
     @POST("sendDocument")
-    Call<ResponseUploadDocumnets> UpdateImageDocs(@Part MultipartBody.Part file , @Part("orderid") RequestBody fname1);
-
-
+    Call<ResponseUploadDocumnets> UpdateImageDocs(@Part MultipartBody.Part file, @Part("orderid") RequestBody fname1);
 
 
     @FormUrlEncoded
@@ -123,5 +132,23 @@ public interface RemoteRepositoryService {
             @Part MultipartBody.Part file
     );
 
+
+    @FormUrlEncoded
+    @POST("nearbyCheck/")
+    Call<NearByCheck> nearByCheck(@Field("orderid") String orderId);
+
+
+    @FormUrlEncoded
+    @POST("Session/")
+    Call<Session> sessionMaintain(@Field("driverno") String driverno);
+
+
+    @FormUrlEncoded
+    @POST("logout/")
+    Call<Logout> logout(@Field("driverno") String driverno);
+
+
+    @POST("orderTracking")
+    Call<ResponseBody> addReview(@Body List<OfflineDataModel> offlineDataModels);
 
 }

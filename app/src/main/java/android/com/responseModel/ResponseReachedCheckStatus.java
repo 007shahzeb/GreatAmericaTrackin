@@ -16,6 +16,6 @@ public class ResponseReachedCheckStatus {
 
     @SerializedName("Status")
     @Expose
-    public String status;
+    public Integer status;
 
 }

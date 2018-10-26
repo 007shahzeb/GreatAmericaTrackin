@@ -1,16 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/reMain"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/background_shipmentlist">
+
+
+    <TextView
+        android:id="@+id/tvLogout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="@dimen/_5sdp"
+        android:layout_marginTop="@dimen/_5sdp"
+        android:background="@drawable/logout_btn_bg"
+        android:drawableLeft="@drawable/logout_icon"
+        android:gravity="center"
+        android:padding="@dimen/_2sdp"
+        android:text="LOGOUT"
+        android:textColor="#fff"
+        android:textSize="@dimen/_13sdp"
+        android:textStyle="bold" />
+
+
+    <TextView
+        android:id="@+id/tvNoInternet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:text="OOPS !! YOU ARE OFFLINE"
+        android:textColor="@color/white"
+        android:textSize="@dimen/_20sdp"
+        android:textStyle="bold"
+        android:visibility="gone" />
+
+
+    <ImageView
+        android:id="@+id/imageOops"
+        android:layout_width="@dimen/_100sdp"
+        android:layout_height="@dimen/_100sdp"
+        android:layout_below="@+id/tvNoInternet"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/oops_"
+        android:visibility="gone" />
 
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@+id/tvLogout"
         android:padding="@dimen/_10sdp"
         android:scrollbars="none"
         android:visibility="visible" />

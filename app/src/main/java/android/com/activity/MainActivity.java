@@ -23,6 +23,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.EventLogTags;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -31,6 +32,7 @@ import android.widget.Toast;
 
 import com.hbb20.CountryCodePicker;
 import com.kaopiz.kprogresshud.KProgressHUD;
+import com.orhanobut.hawk.Hawk;
 import com.sdsmdg.tastytoast.TastyToast;
 import com.taishi.flipprogressdialog.FlipProgressDialog;
 
@@ -52,6 +54,8 @@ public class MainActivity extends AppCompatActivity
     public static String enteredMobileNumber;
     private long lastClickTime = 0;
     private static long back_pressed;
+    public static String fullNumber;
+
 
     FlipProgressDialog fpd;
     KProgressHUD hud;
@@ -66,9 +70,13 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+        Hawk.init(this).build();
+
+
         findindIdsHere();
         listeners();
-
+        ccp.setFocusable(false);
         // Hiding Action in a particular Activity
         ActionBar actionBar = getSupportActionBar();
         actionBar.hide();
@@ -103,7 +111,9 @@ public class MainActivity extends AppCompatActivity
         int id = v.getId();
 
         switch (id) {
+
             case R.id.im_Next: {
+
                 performImageNextOperationHere();
             }
         }
@@ -112,10 +122,8 @@ public class MainActivity extends AppCompatActivity
     private void performImageNextOperationHere() {
 
 
-        if (edMobileNo.getText().toString().isEmpty() || edMobileNo.getText().toString().length() != 10) {
-            edMobileNo.setError("Please Enter The 10 digit Mobile Number");
-
-
+        if (edMobileNo.getText().toString().isEmpty() && edMobileNo.getText().toString().length() != 10) {
+            edMobileNo.setError("Please enter the mobile number");
 
 
             networkConnection();
@@ -127,9 +135,11 @@ public class MainActivity extends AppCompatActivity
             networkConnection();
             flipProgress();
 //            pleaseWaitDialog();
+            String countryCode = ccp.getFullNumberWithPlus();
+            String driverNumber = edMobileNo.getText().toString();
+            fullNumber = countryCode + driverNumber;
 
-
-            HttpModule.provideRepositoryService().getDriverNumberAPI(edMobileNo.getText().toString()).enqueue(new Callback<ResponseDriverNumber>() {
+            HttpModule.provideRepositoryService().getDriverNumberAPI(fullNumber).enqueue(new Callback<ResponseDriverNumber>() {
                 @Override
                 public void onResponse(Call<ResponseDriverNumber> call, Response<ResponseDriverNumber> response) {
 //                    hud.dismiss();
@@ -141,12 +151,15 @@ public class MainActivity extends AppCompatActivity
                         }
                         lastClickTime = SystemClock.elapsedRealtime();
 
-                        enteredMobileNumber = edMobileNo.getText().toString();
-                        savingValuesInSharedPreference(enteredMobileNumber);
-//                        PreferencesManager.setLogin(true , context);
+
+//                        TastyToast.makeText(getApplicationContext(), response.body().getMessage(), TastyToast.LENGTH_SHORT, TastyToast.SUCCESS).show();
+
+//                        PreferencesManager.setLogin(true, context);
+
+                        Hawk.put("FULL_NUMBER", fullNumber);
 
                         Intent intent = new Intent(MainActivity.this, VeryficationCodeActivity.class);
-                        intent.putExtra("drivernumber", enteredMobileNumber);
+                        intent.putExtra("drivernumber", fullNumber);
                         startActivity(intent);
                         finish();
 
@@ -160,8 +173,6 @@ public class MainActivity extends AppCompatActivity
                 public void onFailure(Call<ResponseDriverNumber> call, Throwable t) {
                     System.out.println("MainActivity.onFailure - - " + t);
                     fpd.dismiss();
-//                    hud.dismiss();
-//                    kProgressHUD.dismiss();
                 }
             });
 
@@ -169,25 +180,6 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    private void savingValuesInSharedPreference(String enteredMobileNumber) {
-
-//        PreferencesManager.setLoginDetails("Driverno", enteredMobileNumber, context);
-
-    }
-
-
-    private void pleaseWaitDialog() {
-
-
-        hud = KProgressHUD.create(MainActivity.this)
-                .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
-                .setLabel("Please wait")
-                .setCancellable(false)
-                .setAnimationSpeed(2)
-                .setDimAmount(0.5f)
-                .show();
-
-    }
 
     private void networkConnection() {
 

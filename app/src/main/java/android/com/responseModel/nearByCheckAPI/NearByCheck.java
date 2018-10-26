@@ -1,20 +1,29 @@
-package android.com.responseModel;
+package android.com.responseModel.nearByCheckAPI;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class ResponseUploadDocumnets {
+public class NearByCheck {
 
     @SerializedName("isSuccess")
     @Expose
-    public Boolean isSuccess;
+    private Boolean isSuccess;
 
-    public Boolean getSuccess() {
+    @SerializedName("message")
+    @Expose
+    private String message;
+
+    @SerializedName("Status")
+    @Expose
+    private Integer status;
+
+
+    public Boolean getIsSuccess() {
         return isSuccess;
     }
 
-    public void setSuccess(Boolean success) {
-        isSuccess = success;
+    public void setIsSuccess(Boolean isSuccess) {
+        this.isSuccess = isSuccess;
     }
 
     public String getMessage() {
@@ -25,15 +34,6 @@ public class ResponseUploadDocumnets {
         this.message = message;
     }
 
-    @SerializedName("message")
-    @Expose
-    public String message;
-
-
-    @SerializedName("Status")
-    @Expose
-    private Integer status;
-
     public Integer getStatus() {
         return status;
     }
@@ -41,6 +41,5 @@ public class ResponseUploadDocumnets {
     public void setStatus(Integer status) {
         this.status = status;
     }
-
-
 }
+

@@ -6,6 +6,7 @@ import android.com.garytransportnew.R;
 import android.com.net.HttpModule;
 import android.com.responseModel.ResponseDriverNumber;
 import android.com.responseModel.ResponseOtpNumber;
+import android.com.responseModel.sessionMaintain.Session;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -28,6 +29,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.kaopiz.kprogresshud.KProgressHUD;
+import com.orhanobut.hawk.Hawk;
 import com.sdsmdg.tastytoast.TastyToast;
 import com.taishi.flipprogressdialog.FlipProgressDialog;
 
@@ -99,7 +101,6 @@ public class VeryficationCodeActivity extends AppCompatActivity {
     }
 
     private void findingIdsHere() {
-
 
 
         rlone = findViewById(R.id.rlone);
@@ -645,31 +646,36 @@ public class VeryficationCodeActivity extends AppCompatActivity {
 
 
 //                     Retrofit code
+
                     networkConnection();
                     flipProgress();
-//                    pleaseWaitDialog();
 
 
-                    HttpModule.provideRepositoryService().getOtpNumberAPI(mEd1.getText().toString() + mEd2.getText().toString() + mEd3.getText().toString() + mEd4.getText().toString()).enqueue(new Callback<ResponseOtpNumber>() {
+                    HttpModule.provideRepositoryService().getOtpNumberAPI(mEd1.getText().toString() + mEd2.getText().toString() + mEd3.getText().toString() + mEd4.getText().toString(), MainActivity.fullNumber).enqueue(new Callback<ResponseOtpNumber>() {
                         @Override
                         public void onResponse(Call<ResponseOtpNumber> call, Response<ResponseOtpNumber> response) {
+
                             fpd.dismiss();
-//                            hud.dismiss();
+
                             if (response.body() != null) {
 
                                 if (response.body().isSuccess) {
+
                                     fpd.dismiss();
-//                                    hud.dismiss();
+
                                     if (SystemClock.elapsedRealtime() - lastClickTime < 1000) {
                                         return;
                                     }
                                     lastClickTime = SystemClock.elapsedRealtime();
 
-                                    System.out.println("VeryficationCodeActivity.onResponse - - - Testing heer ");
+
                                     Intent intent = new Intent(VeryficationCodeActivity.this, ShipmenActivity.class);
                                     startActivity(intent);
                                     finish();
+
+
                                 } else {
+
                                     TastyToast.makeText(VeryficationCodeActivity.this, response.body().message, TastyToast.LENGTH_LONG, TastyToast.WARNING).show();
                                 }
 
@@ -679,17 +685,17 @@ public class VeryficationCodeActivity extends AppCompatActivity {
                         @Override
                         public void onFailure(Call<ResponseOtpNumber> call, Throwable t) {
                             System.out.println("VeryficationCodeActivity.onFailure - - " + t);
-                            t.printStackTrace();
+                            TastyToast.makeText(VeryficationCodeActivity.this, "OnFailure", TastyToast.LENGTH_LONG, TastyToast.WARNING).show();
+//                            t.printStackTrace();
                             fpd.dismiss();
-//                            hud.dismiss();
                         }
                     });
 
                 }
                 break;
-
         }
     }
+
 
     private void networkConnection() {
 
@@ -718,20 +724,6 @@ public class VeryficationCodeActivity extends AppCompatActivity {
 //            // Internet Not Available...
 //            TastyToast.makeText(getApplicationContext() , "No Internet Available" , TastyToast.LENGTH_SHORT, TastyToast.SUCCESS).show();
 //        }
-
-    }
-
-
-    private void pleaseWaitDialog() {
-
-
-        hud = KProgressHUD.create(VeryficationCodeActivity.this)
-                .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
-                .setLabel("Please wait")
-                .setCancellable(false)
-                .setAnimationSpeed(2)
-                .setDimAmount(0.5f)
-                .show();
 
     }
 
@@ -776,6 +768,8 @@ public class VeryficationCodeActivity extends AppCompatActivity {
         super.onBackPressed();
 
     }
+
+
 }
 
 

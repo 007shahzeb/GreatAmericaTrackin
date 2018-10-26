@@ -3,6 +3,7 @@ package android.com.adapters;
 import android.com.activity.ShipmenActivity;
 import android.com.activity.UploadImageActivity;
 import android.com.garytransportnew.R;
+import android.com.models.OfflineDataModel;
 import android.com.models.Shipment;
 import android.com.net.HttpModule;
 import android.com.responseModel.ResponseCheckedStatus;
@@ -39,12 +40,12 @@ public class SimpleItem extends AbstractItem<SimpleItem, SimpleItem.ViewHolder> 
 
     private Context context;
     private Shipment shipment;
+    private OfflineDataModel offlineDataModel;
 
 
     public Shipment getShipment() {
         return shipment;
     }
-
 
 
     public SimpleItem(Shipment shipment) {
@@ -66,8 +67,6 @@ public class SimpleItem extends AbstractItem<SimpleItem, SimpleItem.ViewHolder> 
     public ViewHolder getViewHolder(@NonNull View v) {
         return new ViewHolder(v);
     }
-
-
 
 
     public class ViewHolder extends FastAdapter.ViewHolder<SimpleItem> {
@@ -98,11 +97,10 @@ public class SimpleItem extends AbstractItem<SimpleItem, SimpleItem.ViewHolder> 
         }
 
 
-
         @Override
         public void bindView(@NonNull final SimpleItem item, @NonNull List<Object> payloads) {
 
-            Context ctx = itemView.getContext();
+            Context ct = itemView.getContext();
 
             tv_Date.setText(item.shipment.getDeliveryDate());
             tv_ShipmentNumber.setText(item.shipment.getShipMentNo());
@@ -114,6 +112,7 @@ public class SimpleItem extends AbstractItem<SimpleItem, SimpleItem.ViewHolder> 
                     switch (item.getShipment().getStatusId()) {
 
                         case 0:
+                            Toast.makeText(ct, "Case 0", Toast.LENGTH_SHORT).show();
                             break;
 
                         case 1:   // active just coming
@@ -142,6 +141,8 @@ public class SimpleItem extends AbstractItem<SimpleItem, SimpleItem.ViewHolder> 
                                             if (response.body().getSuccess()) {
                                                 item.getShipment().setStatusId(response.body().getStatus());
                                                 fastAdapter.notifyAdapterDataSetChanged();
+
+
                                             } else {
                                                 TastyToast.makeText(context, "Error Occurred", TastyToast.LENGTH_SHORT, TastyToast.SUCCESS).show();
                                             }
@@ -160,7 +161,6 @@ public class SimpleItem extends AbstractItem<SimpleItem, SimpleItem.ViewHolder> 
                         case 2:   // on the way
 
 
-
                             reject.setVisibility(View.GONE);
                             tv_Accept.setVisibility(View.VISIBLE);
                             tv_Accept.setText("ON THE WAY");
@@ -171,77 +171,68 @@ public class SimpleItem extends AbstractItem<SimpleItem, SimpleItem.ViewHolder> 
                             ontheway.setVisibility(View.VISIBLE);
 
 
-
-                            tv_Accept.setOnClickListener(new View.OnClickListener() {
+                            HttpModule.provideRepositoryService().getRealTimeLocationAPI(item.getShipment().getShipMentNo(), "", "", "", "").enqueue(new Callback<ResponseBody>() {
                                 @Override
-                                public void onClick(View v) {
+                                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
 
+                                    EventBus.getDefault().post(item.getShipment().getShipMentNo() + "," + item.getShipment().getRcrecieverId() + "," + item.getShipment().getRclat() + "," + item.getShipment().getRclang() + "," + item.getShipment().getAddress() + "," + item.getShipment().getTime());
+                                    tv_Accept.setEnabled(false);
+                                }
 
-
-                                    HttpModule.provideRepositoryService().getRealTimeLocationAPI(item.getShipment().getShipMentNo(),"" , "").enqueue(new Callback<ResponseBody>() {
-                                        @Override
-                                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-//                                            if (response.body().i) {
-                                            Log.i("", "onResponse: "+response.toString());
-                                                item.getShipment().setStatusId(100);
-                                               EventBus.getDefault().post(item.getShipment().getShipMentNo()+","+item.getShipment().getRcrecieverId()+","+item.getShipment().getRclat()+","+item.getShipment().getRclang());
-
-                                          /*  } else {
-                                                TastyToast.makeText(context, response.body().message, TastyToast.LENGTH_SHORT, TastyToast.SUCCESS).show();
-
-                                            }*/
-                                        }
-
-                                        @Override
-                                        public void onFailure(Call<ResponseBody> call, Throwable t) {
-                                            System.out.println("ShipmenActivity.onFailure - - -" + t);
-                                        }
-                                    });
+                                @Override
+                                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                                    System.out.println("ShipmenActivity.onFailure - - -" + t);
                                 }
                             });
-                            break;
 
-
-
-                        case 4: //rejected
-                            System.out.println("ViewHolder.bindView - Case3- -");
-                            Toast.makeText(context, "REJECT CLCIK", Toast.LENGTH_SHORT).show();
-//                            reject.setOnClickListener(new View.OnClickListener() {
+//                            tv_Accept.setOnClickListener(new View.OnClickListener() {
 //                                @Override
 //                                public void onClick(View v) {
 //
 //
-//                                    new LovelyStandardDialog(context, LovelyStandardDialog.ButtonLayout.VERTICAL)
-//                                            .setTopColorRes(R.color.colorAccent)
-//                                            .setButtonsColorRes(R.color.colorPrimaryDark)
-//                                            .setIcon(R.drawable.app_icon)
-//                                            .setTitle(R.string.donate_title)
-//                                            .setPositiveButton(android.R.string.ok, new View.OnClickListener() {
-//                                                @Override
-//                                                public void onClick(View v) {
-////                                                    rejectingOrder(item);
-//                                                }
-//                                            })
-//                                            .setNegativeButton(android.R.string.no, new View.OnClickListener() {
-//                                                @Override
-//                                                public void onClick(View v) {
-//                                                    TastyToast.makeText(context, "Cancelled", TastyToast.LENGTH_SHORT, TastyToast.SUCCESS).show();
-//                                                }
-//                                            })
-//                                            .show();
+//                                    HttpModule.provideRepositoryService().getRealTimeLocationAPI(item.getShipment().getShipMentNo(), "", "").enqueue(new Callback<ResponseBody>() {
+//                                        @Override
+//                                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+//
+//                                            Log.i("", "onResponse: " + response.toString());
+////                                            item.getShipment().setStatusId(100);
+//                                            EventBus.getDefault().post(item.getShipment().getShipMentNo() + "," + item.getShipment().getRcrecieverId() + "," + item.getShipment().getRclat() + "," + item.getShipment().getRclang());
+//                                            tv_Accept.setEnabled(false);
+//                                        }
+//
+//                                        @Override
+//                                        public void onFailure(Call<ResponseBody> call, Throwable t) {
+//                                            System.out.println("ShipmenActivity.onFailure - - -" + t);
+//                                        }
+//                                    });
 //                                }
 //                            });
+                            break;
+
+
+                        case 5: // near by
+
+                            reject.setVisibility(View.GONE);
+                            tv_Accept.setVisibility(View.VISIBLE);
+                            tv_Accept.setText("ON THE WAY");
+                            tv_Accept.setBackground(tv_Date.getContext().getResources().getDrawable(R.drawable.rounded_button_ontheway));
+                            accept.setVisibility(View.GONE);
+                            upcoming.setVisibility(View.GONE);
+                            reched.setVisibility(View.GONE);
+                            ontheway.setVisibility(View.VISIBLE);
+                            EventBus.getDefault().post(item.getShipment().getShipMentNo() + "," + item.getShipment().getRcrecieverId() + "," + item.getShipment().getRclat() + "," + item.getShipment().getRclang());
+                            tv_Accept.setEnabled(false);
+
 
                             break;
 
 
-                        case 10:
+                        case 4:
 
-                            Toast.makeText(context, "aStatus Test ", Toast.LENGTH_SHORT).show();
+                            break;
 
 
-                            System.out.println("ViewHolder.bindView - CASE 3- " + item.getShipment().getStatusId());
-                            Toast.makeText(context, "REACHED CLCIK", Toast.LENGTH_SHORT).show();
+                        case 3: // reached
 
 
                             tv_Accept.setText("REACHED");
@@ -258,16 +249,22 @@ public class SimpleItem extends AbstractItem<SimpleItem, SimpleItem.ViewHolder> 
                                 public void onClick(View v) {
 
                                     Intent intent = new Intent(context, UploadImageActivity.class);
-                                    intent.putExtra("orderId",item.getShipment().getShipMentNo()+"");
+                                    intent.putExtra("orderId", item.getShipment().getShipMentNo() + "");
                                     context.startActivity(intent);
 
                                 }
                             });
 
                             break;
+
+
+                        case 6:
+                            break;
                     }
 
                 } else {
+
+
                     tv_Accept.setVisibility(View.VISIBLE);
                     reject.setVisibility(View.VISIBLE);
                     upload_file.setVisibility(View.GONE);
@@ -281,48 +278,11 @@ public class SimpleItem extends AbstractItem<SimpleItem, SimpleItem.ViewHolder> 
 
 
             } catch (Exception e) {
+
                 System.out.println("ViewHolder.bindView - - " + e);
             }
         }
 
-        private void rejectingOrder(final SimpleItem item) {
-
-            HttpModule.provideRepositoryService().getOrderRejectedAPI(item.getShipment().getShipMentNo()).enqueue(new Callback<ResponseGetOrderRejected>() {
-                @Override
-                public void onResponse(Call<ResponseGetOrderRejected> call, Response<ResponseGetOrderRejected> response) {
-
-                    if (response.body().isSuccess) {
-
-                        TastyToast.makeText(context, response.body().getMessage(), TastyToast.LENGTH_SHORT, TastyToast.SUCCESS).show();
-                        removeAt(getAdapterPosition());
-
-                        Intent intent = new Intent(context, ShipmenActivity.class);
-                        context.startActivity(intent);
-
-
-                    } else {
-
-                        TastyToast.makeText(context, "Getting False Value", TastyToast.LENGTH_SHORT, TastyToast.SUCCESS).show();
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<ResponseGetOrderRejected> call, Throwable t) {
-
-                    System.out.println("ShipmenActivity.onFailure - - " + t);
-
-                }
-            });
-        }
-
-        private void removeAt(int position) {
-
-            fastAdapter.remove(position);
-            fastAdapter.notifyAdapterItemRemoved(position);
-            fastAdapter.notifyAdapterItemChanged(position);
-            fastAdapter.notifyAdapterDataSetChanged();
-
-        }
 
         @Override
         public void unbindView(@NonNull SimpleItem item) {
@@ -331,8 +291,5 @@ public class SimpleItem extends AbstractItem<SimpleItem, SimpleItem.ViewHolder> 
 
 
     }
-
-
-
 
 }

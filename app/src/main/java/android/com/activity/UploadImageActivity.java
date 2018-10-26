@@ -2,7 +2,10 @@ package android.com.activity;
 // https://stackoverflow.com/questions/22874735/upload-large-file-with-progress-bar-and-without-outofmemory-error-in-android
 
 import android.Manifest;
+import android.app.AlertDialog;
+import android.com.adapters.UploadImageAdapter;
 import android.com.garytransportnew.R;
+import android.com.models.DeleteProgress;
 import android.com.net.HttpModule;
 import android.com.responseModel.ResponseUploadDocumnets;
 import android.content.Context;
@@ -11,9 +14,8 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.PorterDuff;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -22,37 +24,27 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.github.ybq.android.spinkit.style.DoubleBounce;
 import com.mindorks.paracamera.Camera;
 import com.sdsmdg.tastytoast.TastyToast;
 import com.vistrav.ask.Ask;
 
-import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.util.ArrayList;
 
 import dmax.dialog.SpotsDialog;
-import io.reactivex.disposables.CompositeDisposable;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
 import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -79,6 +71,11 @@ public class UploadImageActivity extends AppCompatActivity implements View.OnCli
     int file_size, file_size_gallery;
 
     String filename_gallery;
+    Context context;
+
+
+    ArrayList<DeleteProgress> deleteProgresses = new ArrayList<>();
+    boolean isSelectFromCamera = false;
 
 
     // New Implementations
@@ -96,19 +93,40 @@ public class UploadImageActivity extends AppCompatActivity implements View.OnCli
     private boolean isClickable = false;
 
     LinearLayout parent_layout;
-    ProgressBar mProgressBar;
 
-    private TextView filepathName;
-    private TextView filesizeName;
+    ProgressBar mProgressBar[] = new ProgressBar[10];
+    private TextView filepathName[] = new TextView[10];
+    private TextView filesizeName[] = new TextView[10];
 
-    private ImageView image;
+    private ImageView image[] = new ImageView[10];
 
     String orderID;
+    int index = 0;
+    private LinearLayout[] layout2 = new LinearLayout[10];
+
+    UploadImageAdapter uploadImageAdapter;
+    RecyclerView recyclerView;
+    LinearLayoutManager linearLayoutManager;
+    int arrPosition = 0;
+
+    boolean click = false;
+
+    AlertDialog.Builder alertDialogBuilder;
+    AlertDialog alertDialog;
+
+    TextView tvNo, tvYes;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.upload_image_layout_contraint);
+
+        linearLayoutManager = new LinearLayoutManager(getApplicationContext());
+        recyclerView = findViewById(R.id.recylerView);
+        recyclerView.setLayoutManager(linearLayoutManager);
+        uploadImageAdapter = new UploadImageAdapter(deleteProgresses, context);
+        recyclerView.setAdapter(uploadImageAdapter);
+
 
         if (getIntent() != null) {
             if (getIntent().hasExtra("orderId")) {
@@ -168,7 +186,9 @@ public class UploadImageActivity extends AppCompatActivity implements View.OnCli
         if (requestCode == Camera.REQUEST_TAKE_PHOTO) {
 
 
-            createLayout();
+//            createLayout();
+
+
             bitmap = camera.getCameraBitmap();
             if (bitmap != null) {
                 filePath = camera.getCameraBitmapPath();
@@ -177,9 +197,20 @@ public class UploadImageActivity extends AppCompatActivity implements View.OnCli
 
                 String path = filePath;//it contain your path of image..im using a temp string..
                 String filename = path.substring(path.lastIndexOf("/") + 1); // Getting the file name here
+                click = true;
 
-                filepathName.setText(filename);
-                filesizeName.setText(String.valueOf(file_size) + " KB");
+
+//                filepathName[index].setText(filename);
+//                filesizeName[index].setText(String.valueOf(file_size) + " KB");
+
+                DeleteProgress deleteProgress = new DeleteProgress();
+
+                deleteProgress.setFilename(filename);
+                deleteProgress.setFileSize(String.valueOf(file_size) + " KB");
+                deleteProgress.setFileToUploadPath(filePath);
+
+                deleteProgresses.add(deleteProgress);
+                uploadImageAdapter.notifyDataSetChanged();
 
 
             } else {
@@ -190,7 +221,8 @@ public class UploadImageActivity extends AppCompatActivity implements View.OnCli
 
         } else if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && null != data) {
 
-            createLayout();
+
+//            createLayout();
 
             selectedImage = data.getData();
             String[] filePathColumn = {MediaStore.Images.Media.DATA};
@@ -206,10 +238,22 @@ public class UploadImageActivity extends AppCompatActivity implements View.OnCli
 
             String path = filePath;//it contain your path of image..im using a temp string..
             filename_gallery = path.substring(path.lastIndexOf("/") + 1);
+            click = true;
 
-            filepathName.setText(filename_gallery);
-            filesizeName.setText(String.valueOf(file_size_gallery) + " KB");
+
+//            filepathName[index].setText(filename_gallery);
+//            filesizeName[index].setText(String.valueOf(file_size_gallery) + " KB");
             cursor.close();
+
+            DeleteProgress deleteProgress = new DeleteProgress();
+
+            deleteProgress.setFilename(filename_gallery);
+            deleteProgress.setFileSize(String.valueOf(file_size_gallery) + " KB");
+            deleteProgress.setFileToUploadPath(filePath);
+
+            deleteProgresses.add(deleteProgress);
+            uploadImageAdapter.notifyDataSetChanged();
+
 
         }
     }
@@ -220,7 +264,7 @@ public class UploadImageActivity extends AppCompatActivity implements View.OnCli
         tv_SelectFromPhotos.setOnClickListener(this);
         imageUploadingButton.setOnClickListener(this);
         tv_Cancel.setOnClickListener(this);
-        imageUploadingButton.setClickable(isClickable);
+//        imageUploadingButton.setClickable(isClickable);
     }
 
 
@@ -238,12 +282,12 @@ public class UploadImageActivity extends AppCompatActivity implements View.OnCli
 
         image_SelectFromCamera = findViewById(R.id.image_SelectFromCamera);
         tv_SelectFromPhotos = findViewById(R.id.tv_SelectFromPhotos);
-        mProgressBar = (ProgressBar) findViewById(R.id.progressBar1);
+//        mProgressBar = (ProgressBar) findViewById(R.id.progressBar1);
         tv_MBTextview = findViewById(R.id.tv_MBTextview);
         tv_transport_docFile = findViewById(R.id.tv_transport_docFile);
         imageUploadingButton = findViewById(R.id.imageUploadingButton);
         tv_Cancel = findViewById(R.id.tv_Cancel);
-        parent_layout = findViewById(R.id.linear_parent);
+//        parent_layout = findViewById(R.id.linear_parent);
 
 
     }
@@ -257,8 +301,8 @@ public class UploadImageActivity extends AppCompatActivity implements View.OnCli
 
             case R.id.image_SelectFromCamera:
 
-                imageUploadingButton.setClickable(true);
-                if (imageUploadingButton.getText().toString().equalsIgnoreCase("UPLOADED"))
+//                imageUploadingButton.setClickable(false);
+                if (imageUploadingButton.getText().toString().equalsIgnoreCase("UPLOAD FINISHED"))
                     imageUploadingButton.setText("UPLOAD");
                 clickingPicturesFromCamera();
                 break;
@@ -266,8 +310,7 @@ public class UploadImageActivity extends AppCompatActivity implements View.OnCli
 
             case R.id.tv_SelectFromPhotos:
 
-                imageUploadingButton.setClickable(true);
-                if (imageUploadingButton.getText().toString().equalsIgnoreCase("UPLOADED"))
+                if (imageUploadingButton.getText().toString().equalsIgnoreCase("UPLOAD FINISHED"))
                     imageUploadingButton.setText("UPLOAD");
                 buildingTheGallery();
                 break;
@@ -275,6 +318,162 @@ public class UploadImageActivity extends AppCompatActivity implements View.OnCli
 
             case R.id.imageUploadingButton:
 
+                if (click && deleteProgresses.size() > 0) {
+
+                    uploadImageDialog();
+
+                } else {
+                    TastyToast.makeText(getApplicationContext(), "Please upload the documents", TastyToast.LENGTH_SHORT, TastyToast.WARNING).show();
+                }
+
+
+//                if (click) {
+//                    if (Build.VERSION.SDK_INT >= 23) {
+//
+//                        if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+//                                == PackageManager.PERMISSION_GRANTED) {
+//                            Log.v("", "Permission is granted");
+//                        } else {
+//
+//                            Log.v("", "Permission is revoked");
+//                            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+//                        }
+//                    } else { //permission is automatically granted on sdk<23 upon installation
+//                        Log.v("", "Permission is granted");
+//                    }
+//
+//
+//                    if (dialog == null) {
+//                        dialog = new SpotsDialog(mContext);
+//                        dialog.setCancelable(false);
+//                        dialog.show();
+//
+//
+//                    } else dialog.show();
+//
+//
+//                    if (imageUploadingButton.getText().toString().equalsIgnoreCase("UPLOAD")) {
+//                        imageUploadingButton.setText("UPLOADING...");
+//
+//                        new Thread(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                try {
+//                                    newWay(arrPosition);
+//                                } catch (Exception e) {
+//                                    e.printStackTrace();
+//                                }
+//                            }
+//                        }).start();
+//                    }
+//                } else {
+//
+//
+//                    TastyToast.makeText(getApplicationContext(), "Please upload the documents", TastyToast.LENGTH_SHORT, TastyToast.SUCCESS).show();
+//                    return;
+//
+//
+//                }
+//                imageUploadingButton.setClickable(true);
+
+
+//                if (Build.VERSION.SDK_INT >= 23) {
+//
+//                    if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+//                            == PackageManager.PERMISSION_GRANTED) {
+//                        Log.v("", "Permission is granted");
+//                    } else {
+//
+//                        Log.v("", "Permission is revoked");
+//                        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+//                    }
+//                } else { //permission is automatically granted on sdk<23 upon installation
+//                    Log.v("", "Permission is granted");
+//                }
+//
+//
+//                if (dialog == null) {
+//                    dialog = new SpotsDialog(mContext);
+//                    dialog.setCancelable(false);
+//                    dialog.show();
+//
+//
+//                } else dialog.show();
+//
+//
+//                if (imageUploadingButton.getText().toString().equalsIgnoreCase("UPLOAD")) {
+//                    imageUploadingButton.setText("UPLOADING...");
+//
+//                    new Thread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            try {
+//                                newWay(arrPosition);
+//                            } catch (Exception e) {
+//                                e.printStackTrace();
+//                            }
+//                        }
+//                    }).start();
+//                }
+
+                break;
+
+            case R.id.tv_Cancel:
+                break;
+
+        }
+    }
+
+    private void uploadImageDialog() {
+
+        LayoutInflater li = LayoutInflater.from(this);
+        View dialogView = li.inflate(R.layout.dialog_upload_image, null);
+
+
+        findingLogoutDialodIdsHere(dialogView);
+
+
+        alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setView(dialogView);
+        alertDialogBuilder
+                .setCancelable(true);
+        alertDialog = alertDialogBuilder.create();
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        alertDialog.show();
+
+
+    }
+
+
+    private void findingLogoutDialodIdsHere(View dialogView) {
+
+
+        tvNo = dialogView.findViewById(R.id.tvNo);
+        tvYes = dialogView.findViewById(R.id.tvYes);
+
+        takingClicksOfLogout();
+
+    }
+
+    private void takingClicksOfLogout() {
+
+        tvNo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                alertDialog.dismiss();
+                TastyToast.makeText(getApplicationContext(), "Thanks", TastyToast.LENGTH_SHORT, TastyToast.SUCCESS).show();
+
+            }
+        });
+
+
+        tvYes.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertDialog.dismiss();
+
+//                if (click) {
 
                 if (Build.VERSION.SDK_INT >= 23) {
 
@@ -284,7 +483,7 @@ public class UploadImageActivity extends AppCompatActivity implements View.OnCli
                     } else {
 
                         Log.v("", "Permission is revoked");
-                        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+                        ActivityCompat.requestPermissions(UploadImageActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
                     }
                 } else { //permission is automatically granted on sdk<23 upon installation
                     Log.v("", "Permission is granted");
@@ -307,32 +506,37 @@ public class UploadImageActivity extends AppCompatActivity implements View.OnCli
                         @Override
                         public void run() {
                             try {
-                                newWay();
+                                newWay(arrPosition);
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
                         }
                     }).start();
                 }
+//                }
 
-                break;
 
-            case R.id.tv_Cancel:
-                Intent intent = new Intent(Intent.ACTION_MAIN);
-                intent.addCategory(Intent.CATEGORY_HOME);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                this.finish();
-                startActivity(intent);
-                finish();
-                break;
+//                else {
+//
+//
+////                    TastyToast.makeText(getApplicationContext(), "Please upload the documents", TastyToast.LENGTH_SHORT, TastyToast.SUCCESS).show();
+////                    return;
+//
+//
+//                }
 
-        }
+
+            }
+        });
+
+
     }
 
-    private void newWay() {
+
+    private void newWay(final int position) {
 
 
-        File file = new File(filePath);
+        File file = new File(deleteProgresses.get(position).getFileToUploadPath());
 
         RequestBody oId = RequestBody.create(MediaType.parse("text/plain"), orderID);
         //RequestBody rq6 = RequestBody.create(MediaType.parse("image/*"), file.getName());
@@ -347,15 +551,45 @@ public class UploadImageActivity extends AppCompatActivity implements View.OnCli
 
                     if (response.body().getSuccess()) {
 
-                        isClickable = true;
-                        imageUploadingButton.setClickable(isClickable);
-                        mProgressBar.getProgressDrawable().setColorFilter(Color.GREEN, PorterDuff.Mode.SRC_IN);
-                        dialog.dismiss();
-                        if (imageUploadingButton.getText().toString().equalsIgnoreCase("UPLOADING..."))
-                            imageUploadingButton.setText("UPLOADED");
-                        imageUploadingButton.setClickable(false);
+//
+//                        isClickable = true;
+//                        imageUploadingButton.setClickable(isClickable);
+////                        mProgressBar[index].getProgressDrawable().setColorFilter(Color.GREEN, PorterDuff.Mode.SRC_IN);
+//                        dialog.dismiss();
+//                        if (imageUploadingButton.getText().toString().equalsIgnoreCase("UPLOADING..."))
+//                            imageUploadingButton.setText("UPLOADED");
+//                        imageUploadingButton.setClickable(false);
+//
+//                        TastyToast.makeText(getApplicationContext(), response.body().getMessage(), TastyToast.LENGTH_SHORT, TastyToast.SUCCESS).show();
 
-                        TastyToast.makeText(getApplicationContext(), response.body().getMessage(), TastyToast.LENGTH_SHORT, TastyToast.SUCCESS).show();
+
+                        if (position < deleteProgresses.size() - 1) {
+                            newWay(++arrPosition);
+                        }
+
+                        {
+                            deleteProgresses.get(position).setIsCompleted(true);
+                            uploadImageAdapter.notifyDataSetChanged();
+
+                            dialog.dismiss();
+                            if (imageUploadingButton.getText().toString().equalsIgnoreCase("UPLOADING..."))
+                                imageUploadingButton.setText("UPLOAD FINISHED");
+
+
+                            new Handler().postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    finish();
+
+                                }
+                            }, 1000);
+
+
+                            imageUploadingButton.setClickable(false);
+                            tv_SelectFromPhotos.setClickable(false);
+                            image_SelectFromCamera.setClickable(false);
+                        }
+
 
                     } else {
 
@@ -381,46 +615,93 @@ public class UploadImageActivity extends AppCompatActivity implements View.OnCli
 
     public void createLayout() {
 
-        filepathName = new TextView(this);
+        filepathName[index] = new TextView(this);
 
 
-        LinearLayout layout2 = new LinearLayout(this);
+        layout2[index] = new LinearLayout(this);
         LinearLayout.LayoutParams layoutParamsmain = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        layout2.setLayoutParams(layoutParamsmain);
-        layout2.setOrientation(LinearLayout.HORIZONTAL);
+        layout2[index].setLayoutParams(layoutParamsmain);
+        layout2[index].setOrientation(LinearLayout.HORIZONTAL);
 
-        filesizeName = new TextView(this);
+        filesizeName[index] = new TextView(this);
 
 
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         layoutParams.gravity = Gravity.START;
         layoutParams.weight = 1.0f;
 
-        filesizeName.setLayoutParams(layoutParams);
-        layout2.addView(filesizeName);
+        filesizeName[index].setLayoutParams(layoutParams);
+        layout2[index].addView(filesizeName[index]);
 
 
-        image = new ImageView(this);
-        image.setBackground(getResources().getDrawable(R.drawable.ic_action_delete));
+        image[index] = new ImageView(this);
+        image[index].setBackground(getResources().getDrawable(R.drawable.ic_action_delete));
 
         LinearLayout.LayoutParams layoutParams2 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 
         layoutParams.gravity = Gravity.END;
         layoutParams.weight = 1.0f;
-        image.setLayoutParams(layoutParams2);
-        layout2.addView(image);
+        image[index].setLayoutParams(layoutParams2);
+        layout2[index].addView(image[index]);
 
 
-        mProgressBar = new ProgressBar(UploadImageActivity.this, null, android.R.attr.progressBarStyleHorizontal);
+        mProgressBar[index] = new ProgressBar(UploadImageActivity.this, null, android.R.attr.progressBarStyleHorizontal);
+        mProgressBar[index].setVisibility(View.VISIBLE);
+        layout2[index].setVisibility(View.VISIBLE);
+        filepathName[index].setVisibility(View.VISIBLE);
 
-
-        parent_layout.addView(filepathName);
-        parent_layout.addView(layout2);
-        parent_layout.addView(mProgressBar);
+        parent_layout.addView(filepathName[index]);
+        parent_layout.addView(layout2[index]);
+        parent_layout.addView(mProgressBar[index]);
 
 
         parent_layout.refreshDrawableState();
 
+
+        image[index].setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                int temp = index - 1;
+
+
+                switch (index - 1) {
+
+                    case 0:
+
+
+                        break;
+
+                    case 1:
+
+
+                        break;
+
+                    case 2:
+
+
+                        break;
+
+                }
+
+               /* if(temp==0)
+                {
+                    filepathName[0].setVisibility(View.GONE);
+                    layout2[0].setVisibility(View.GONE);
+                    mProgressBar[0].setVisibility(View.GONE);
+                    parent_layout.refreshDrawableState();
+                    index--;
+                    return;
+                }
+
+                filepathName[temp-1].setVisibility(View.GONE);
+                layout2[temp-1].setVisibility(View.GONE);
+                mProgressBar[temp-1].setVisibility(View.GONE);
+
+                parent_layout.refreshDrawableState();*/
+                index--;
+            }
+        });
 
     }
 

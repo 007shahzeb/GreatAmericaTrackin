@@ -69,8 +69,11 @@
 
                         <TextView
                             android:id="@+id/picker_name"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:gravity="center"
+                            android:maxLines="1"
                             android:text="Shahzeb"
                             android:textColor="#000000"
                             android:textSize="@dimen/_12sdp"
@@ -111,8 +114,11 @@
 
                         <TextView
                             android:id="@+id/picker_address"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:gravity="center"
+                            android:maxLines="3"
                             android:text="Ropar Punjab"
                             android:textColor="#000000"
                             android:textSize="@dimen/_12sdp"
@@ -154,8 +160,10 @@
 
                         <TextView
                             android:id="@+id/pickup_date"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:gravity="center"
                             android:text="10 May 2018"
                             android:textColor="#000000"
                             android:textSize="@dimen/_12sdp"
@@ -196,8 +204,10 @@
 
                         <TextView
                             android:id="@+id/load_number"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:gravity="center"
                             android:text="1236549870"
                             android:textColor="#000000"
                             android:textSize="@dimen/_12sdp"
@@ -239,8 +249,10 @@
 
                         <TextView
                             android:id="@+id/shipper_note"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:gravity="center"
                             android:text="Hello Man , How are you doing..!!"
                             android:textColor="#000000"
                             android:textSize="@dimen/_12sdp"
@@ -281,8 +293,10 @@
 
                         <TextView
                             android:id="@+id/phone_number"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:gravity="center"
                             android:text="+91-8860984985"
                             android:textColor="#000000"
                             android:textSize="@dimen/_12sdp"
@@ -359,7 +373,7 @@
             android:layout_height="wrap_content"
             android:paddingLeft="@dimen/_15sdp"
             android:paddingTop="2dp"
-            android:text="Shipment Reciver Information"
+            android:text="Shipment Receiver Information"
             android:textColor="#000000"
             android:textSize="14sp"
             android:textStyle="bold" />
@@ -407,8 +421,10 @@
 
                         <TextView
                             android:id="@+id/reciver_name"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:gravity="center"
                             android:text="Shahzeb"
                             android:textColor="#000000"
                             android:textSize="@dimen/_12sdp"
@@ -449,8 +465,10 @@
 
                         <TextView
                             android:id="@+id/reciver_address"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:gravity="center"
                             android:text="Ropar Punjab"
                             android:textColor="#000000"
                             android:textSize="@dimen/_12sdp"
@@ -491,8 +509,10 @@
 
                         <TextView
                             android:id="@+id/delivery_date"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:gravity="center"
                             android:text="10 May 2018"
                             android:textColor="#000000"
                             android:textSize="@dimen/_12sdp"
@@ -533,8 +553,10 @@
 
                         <TextView
                             android:id="@+id/reciver_pickupnumber"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:gravity="center"
                             android:text="1236549870"
                             android:textColor="#000000"
                             android:textSize="@dimen/_12sdp"
@@ -557,7 +579,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Reciver Note -"
+                            android:text="Receiver Note -"
                             android:textColor="#000"
                             android:textSize="@dimen/_12sdp"
                             android:textStyle="italic" />
@@ -575,8 +597,10 @@
 
                         <TextView
                             android:id="@+id/reciver_note"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:gravity="center"
                             android:text="Hello Man , How are you doing..!!"
                             android:textColor="#000000"
                             android:textSize="@dimen/_12sdp"
@@ -616,8 +640,10 @@
 
                         <TextView
                             android:id="@+id/receiver_phonenumber"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:gravity="center"
                             android:text="+91-8860984985"
                             android:textColor="#000000"
                             android:textSize="@dimen/_12sdp"

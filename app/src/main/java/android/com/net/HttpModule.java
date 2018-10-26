@@ -17,15 +17,17 @@ public class HttpModule {
     private static OkHttpClient getOkkHttpClient() {
 
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+
         logging.setLevel(BuildConfig.DEBUG ? HttpLoggingInterceptor.Level.BODY : HttpLoggingInterceptor.Level.NONE);
-        return new OkHttpClient.Builder()/*.writeTimeout(5, TimeUnit.MINUTES)/*.addInterceptor(logging)*//*.addNetworkInterceptor(new StethoInterceptor())*/.readTimeout(180, TimeUnit.SECONDS).connectTimeout(180, TimeUnit.SECONDS).build();
+        return new OkHttpClient.Builder().writeTimeout(60, TimeUnit.SECONDS).connectTimeout(60, TimeUnit.SECONDS).build();
 
     }
 
 
     public static Retrofit getRetroFitClient() {
         return new Retrofit.Builder()
-                .baseUrl("http://34.234.186.44:4000/driverapp/")
+                .baseUrl("http://greatamericatracking.com/driverapp/") // for testing  http://34.234.186.44:4000/driverapp/
+//        http://greatamericatracking.com/driverapp/ValidateNumber
                 // .baseUrl("http://18.217.234.39/EZE/public/api/addAttachmentImage")
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create()) // Shahzeb added this to use RxJava
                 .addConverterFactory(GsonConverterFactory.create(new GsonBuilder().setLenient().create()))
@@ -40,3 +42,6 @@ public class HttpModule {
 
 
 }
+
+
+// .baseUrl("http://greatamericatracking.com/driverapp/") live server url
